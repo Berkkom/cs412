@@ -1,0 +1,9 @@
+{% extends "quotes/base.html" %}
+{% block title %}Quote{% endblock %}
+
+{% block content %}
+  <div class="card">
+    <img class="portrait" src="{{ image }}" alt="Jimmy Page portrait">
+    <p class="q">“{{ quote }}”</p>
+  </div>
+{% endblock %}

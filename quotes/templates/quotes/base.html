@@ -1,0 +1,26 @@
+{% load static %}
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>{% block title %}Quotes{% endblock %}</title>
+  <link rel="stylesheet" href="{% static 'styles.css' %}">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <h1>Quotes from Jimmy Page</h1>
+  <nav>
+    <a href="/">Home</a>
+    <a href="/quote/">Randomize</a>
+    <a href="/show_all/">Show All</a>
+    <a href="/about/">About</a>
+  </nav>
+  <hr>
+
+  <main class="page">
+    {% block content %}{% endblock %}
+  </main>
+</body>
+</html>
