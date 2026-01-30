@@ -9,4 +9,4 @@ urlpatterns = [
     path('show_all/', views.show_all, name='show_all'),
     path('about/', views.about, name='about'),
 ]
-urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+# urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
