@@ -1,6 +1,15 @@
+# File: views.py
+# Author: Berk Komurcuoglu (berkkom@bu.edu), 1/30/2026
+# Description: View functions for the quotes app. This module stores
+# a hard-coded list of Jimmy Page quotes and matching image URLs, and
+# renders pages to display a random quote/image pair, show all content,
+# and display an about page.
+
 from django.shortcuts import render
 import random
 
+# List of Jimmy Page quotes (strings). Each quote corresponds to the
+# image URL at the same index in IMAGES.
 QUOTES = [
     "Been dazed and confused for so long, it's not true. A-wanted a woman, never bargained for you. Lots of people talkin', few of them know. Soul of a woman was created below.",
     "We didn’t over-rehearse things. We just had them so that they were just right, so that there was this tension – maybe there might be a mistake. But there won’t be, because this is how we’re all going to do it and it’s gonna work!",
@@ -14,6 +23,7 @@ QUOTES = [
     "We come from the land of the ice and snow, from the midnight sun where the hot springs blow.",
 ]
 
+# List of image URLs (strings).
 IMAGES = [
     "https://upload.wikimedia.org/wikipedia/commons/a/a8/JimmyPage2.jpg",
     "https://upload.wikimedia.org/wikipedia/commons/9/9f/Jimmy_Page_at_the_Echo_music_award_2013.jpg",
@@ -28,6 +38,7 @@ IMAGES = [
 ]
 
 def quote(request):
+    """Display a random quote and matching image."""
     i = random.randrange(len(QUOTES))
     context = {
         "quote": QUOTES[i],
@@ -36,10 +47,12 @@ def quote(request):
     return render(request, "quotes/quote.html", context)
 
 def show_all(request):
+    """Display all quotes and all images."""
     return render(request, "quotes/show_all.html", {
         "quotes": QUOTES,
         "images": IMAGES,
     })
 
 def about(request):
+    """Display the about page."""
     return render(request, "quotes/about.html")
