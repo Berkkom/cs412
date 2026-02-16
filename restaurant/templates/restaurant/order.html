@@ -1,0 +1,90 @@
+<!-- 
+File: order.html 
+Author: Berk Komurcuoglu (berkkom@bu.edu), 2/15/2026 
+Description: Order page template for the restaurant app. Displays the
+menu items, daily special, customer information fields, and submits the
+order form via POST to the confirmation page. 
+-->
+
+{% extends "restaurant/base.html" %}
+{% block title %}Order | Da Berkosh{% endblock %}
+
+{% block content %}
+  <h1>Online Order</h1>
+
+  <form class="card" method="POST" action="{% url 'restaurant:confirmation' %}">
+    {% csrf_token %}
+
+    <h2>Menu</h2>
+
+    <div class="menu-item">
+      <label>
+        <input type="checkbox" name="carbonara">
+        {{ menu.carbonara.name }} — ${{ menu.carbonara.price }}
+      </label>
+    </div>
+
+    <div class="menu-item">
+      <label>
+        <input type="checkbox" name="cacio">
+        {{ menu.cacio.name }} — ${{ menu.cacio.price }}
+      </label>
+    </div>
+
+    <div class="menu-item">
+      <label>
+        <input type="checkbox" name="risotto">
+        {{ menu.risotto.name }} — ${{ menu.risotto.price }}
+      </label>
+    </div>
+
+    <div class="menu-item">
+      <label>
+        <input type="checkbox" name="florentine">
+        {{ menu.florentine.name }} — ${{ menu.florentine.price }}
+      </label>
+
+      <div class="options">
+        <div class="muted">Florentine sides (optional):</div>
+        <label><input type="checkbox" name="asparagus">
+          {{ florentine_extras.asparagus.label }} (+${{ florentine_extras.asparagus.price }})
+        </label>
+        <label><input type="checkbox" name="fries">
+          {{ florentine_extras.fries.label }} (+${{ florentine_extras.fries.price }})
+        </label>
+        <label><input type="checkbox" name="mashed">
+          {{ florentine_extras.mashed.label }} (+${{ florentine_extras.mashed.price }})
+        </label>
+      </div>
+    </div>
+
+    <hr>
+
+    <h2>Daily Special</h2>
+    <div class="menu-item special">
+      <label>
+        <input type="checkbox" name="daily_special">
+        <strong>{{ daily_special.name }}</strong> — ${{ daily_special.price }}
+      </label>
+      <div class="muted">{{ daily_special.desc }}</div>
+    </div>
+
+    <input type="hidden" name="special_index" value="{{ special_index }}">
+
+    <hr>
+
+    <h2>Customer Info</h2>
+    <div class="grid">
+      <label>Name <input type="text" name="customer_name" required></label>
+      <label>Phone <input type="text" name="phone" required></label>
+      <label>Email <input type="email" name="email" required></label>
+    </div>
+
+    <label>
+      Special Instructions
+      <textarea name="instructions" rows="4"></textarea>
+    </label>
+
+    <button class="button" type="submit">Submit Order</button>
+  </form>
+{% endblock %}

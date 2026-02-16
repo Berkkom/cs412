@@ -1,0 +1,50 @@
+<!-- 
+File: main.html 
+Author: Berk Komurcuoglu (berkkom@bu.edu), 2/15/2026 
+Description: Main page template for the restaurant app. Displays the
+restaurant name, location, hours, and photos. 
+-->
+
+{% extends "restaurant/base.html" %}
+{% load static %}
+{% block title %}Main | Da Berkosh{% endblock %}
+
+{% block content %}
+  <h1>Da Berkosh</h1>
+  <p class="muted">Classic Italian cooking • Handmade pasta • Firenze-inspired steak</p>
+
+  <section class="card">
+    <h2>Location</h2>
+    <p>722 Commonwealth Ave, Boston, MA</p>
+    <p class="muted">In BU campus • Takeout + dine-in</p>
+  </section>
+
+  <section class="card">
+    <h2>Hours</h2>
+    <table class="hours">
+      <tr><td>Monday</td><td>12:00 PM – 9:00 PM</td></tr>
+      <tr><td>Tuesday</td><td>12:00 PM – 9:00 PM</td></tr>
+      <tr><td>Wednesday</td><td>12:00 PM – 9:00 PM</td></tr>
+      <tr><td>Thursday</td><td>12:00 PM – 10:00 PM</td></tr>
+      <tr><td>Friday</td><td>12:00 PM – 11:00 PM</td></tr>
+      <tr><td>Saturday</td><td>1:00 PM – 11:00 PM</td></tr>
+      <tr><td>Sunday</td><td>1:00 PM – 8:00 PM</td></tr>
+    </table>
+  </section>
+
+  <section class="card">
+    <h2>Photos</h2>
+    <div class="photo-grid">
+      <img
+        src="{% static 'carbonara.jpg' %}"
+        alt="Carbonara"
+      >
+      <img
+        src="https://upload.wikimedia.org/wikipedia/commons/1/12/Bistecca_alla_fiorentina-01.jpg"
+        alt="Steak dish"
+      >
+    </div>
+  </section>
+
+  <a class="button" href="{% url 'restaurant:order' %}">Order Online</a>
+{% endblock %}

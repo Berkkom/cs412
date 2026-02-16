@@ -1,0 +1,58 @@
+<!-- 
+File: confirmation.html 
+Author: Berk Komurcuoglu (berkkom@bu.edu), 2/15/2026 
+Description: Confirmation page template for the restaurant app. Displays
+ordered items, customer info, total price, and a ready time. 
+-->
+
+
+{% extends "restaurant/base.html" %}
+{% block title %}Order | Da Berkosh{% endblock %}
+
+{% block content %}
+  <h1>Order Confirmation</h1>
+
+  <section class="card">
+    <h2>Customer</h2>
+    <p><strong>Name:</strong> {{ customer_name }}</p>
+    <p><strong>Phone:</strong> {{ phone }}</p>
+    <p><strong>Email:</strong> {{ email }}</p>
+    {% if instructions %}
+      <p><strong>Instructions:</strong> {{ instructions }}</p>
+    {% endif %}
+  </section>
+
+  <section class="card">
+    <h2>Your Items</h2>
+
+    {% if ordered_items %}
+      <ul class="item-list">
+        {% for item in ordered_items %}
+          <li>
+            <div>
+              <strong>{{ item.name }}</strong>
+              {% if item.details %}
+                <div class="muted">{{ item.details }}</div>
+              {% endif %}
+            </div>
+            <div>${{ item.price|floatformat:2 }}</div>
+          </li>
+        {% endfor %}
+      </ul>
+
+      <div class="total-row">
+        <div><strong>Total</strong></div>
+        <div><strong>${{ total }}</strong></div>
+      </div>
+    {% else %}
+      <p class="muted">No items were selected.</p>
+    {% endif %}
+  </section>
+
+  <section class="card">
+    <h2>Ready Time</h2>
+    <p class="ready-time">{{ ready_time }}</p>
+  </section>
+
+  <a class="button" href="{% url 'restaurant:order' %}">Place Another Order</a>
+{% endblock %}

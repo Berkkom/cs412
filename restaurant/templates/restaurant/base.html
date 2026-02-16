@@ -1,0 +1,35 @@
+<!-- 
+File: base.html 
+Author: Berk Komurcuoglu (berkkom@bu.edu), 2/15/2026 
+Description: Base template for the restaurant app. Provides a shared
+page layout including the header, navigation links, and CSS loading. 
+-->
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}Restaurant{% endblock %}</title>
+  <link rel="stylesheet" href="{% static 'restaurant_styles.css' %}">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-row">
+      <div class="brand">
+        <div class="brand-name">Da Berkosh</div>
+        <div class="brand-tag">Italian Classics</div>
+      </div>
+      <nav class="nav">
+        <a href="{% url 'restaurant:main' %}">Main</a>
+        <a href="{% url 'restaurant:order' %}">Order</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    {% block content %}{% endblock %}
+  </main>
+</body>
+</html>
