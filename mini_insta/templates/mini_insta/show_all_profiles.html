@@ -1,20 +1,30 @@
+<!--
+File: show_all_profiles.html
+Author: Berk Komurcuoglu (berkkom@bu.edu), 2/18/2026
+Description: Displays a grid/list of all Profile records.
+-->
+
 {% extends "mini_insta/base.html" %}
 
 {% block content %}
   <h2 class="page-title">All Profiles</h2>
 
   <div class="grid">
-    {% for p in profiles %}
+    {% for p in object_list %}
       <div class="card">
         <div class="card-row">
-          {% if p.profile_image_url %}
-            <img class="avatar" src="{{ p.profile_image_url }}" alt="{{ p.username }} profile image" />
-          {% else %}
-            <div class="avatar-placeholder"></div>
-          {% endif %}
+          <a href="{% url 'show_profile' p.pk %}">
+            {% if p.profile_image_url %}
+              <img class="avatar" src="{{ p.profile_image_url }}" alt="{{ p.username }} profile image" />
+            {% else %}
+              <div class="avatar-placeholder"></div>
+            {% endif %}
+          </a>
 
           <div>
-            <div class="display-name">{{ p.display_name }}</div>
+            <div class="display-name">
+              <a href="{% url 'show_profile' p.pk %}">{{ p.display_name }}</a>
+            </div>
             <div class="username">@{{ p.username }}</div>
           </div>
         </div>

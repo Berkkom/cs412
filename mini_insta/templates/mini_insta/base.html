@@ -1,3 +1,8 @@
+<!--
+File: base.html
+Author: Berk Komurcuoglu (berkkom@bu.edu), 2/18/2026
+Description: Base template for mini_insta pages (shared header/footer and CSS).
+-->
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
@@ -18,11 +23,19 @@
     </div>
   </header>
 
+  <!-- THIS IS THE MISSING PART -->
   <main class="main">
     <div class="container">
       {% block content %}{% endblock %}
     </div>
   </main>
 
+  <footer class="site-footer">
+    <div class="container">
+      <span class="footer-link">
+         <a href="{% url 'show_all_profiles' %}">Back to all profiles</a>
+      </span>
+    </div>
+  </footer>
 </body>
 </html>

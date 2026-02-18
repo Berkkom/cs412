@@ -1,0 +1,46 @@
+<!--
+File: show_profile.html
+Author: Berk Komurcuoglu (berkkom@bu.edu), 2/18/2026
+Description: Displays a single Profile record (profile detail page).
+-->
+
+{% extends "mini_insta/base.html" %}
+
+{% block content %}
+  <h2 class="page-title">{{ profile.display_name }}</h2>
+
+  <div class="profile-detail">
+    <div class="profile-left">
+      {% if profile.profile_image_url %}
+        <img class="profile-avatar-large"
+             src="{{ profile.profile_image_url }}"
+             alt="{{ profile.username }} profile image">
+      {% else %}
+        <div class="profile-avatar-large placeholder"></div>
+      {% endif %}
+    </div>
+
+    <div class="profile-right">
+      <table class="profile-table">
+        <tr>
+          <th>Username</th>
+          <td>@{{ profile.username }}</td>
+        </tr>
+        <tr>
+          <th>Display name</th>
+          <td>{{ profile.display_name }}</td>
+        </tr>
+        <tr>
+          <th>Bio</th>
+          <td>{{ profile.bio_text|linebreaksbr }}</td>
+        </tr>
+        <tr>
+          <th>Join date</th>
+          <td>{{ profile.join_date }}</td>
+        </tr>
+      </table>
+
+      
+    </div>
+  </div>
+{% endblock %}

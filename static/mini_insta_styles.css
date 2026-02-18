@@ -90,3 +90,63 @@ body {
 .username {
   color: #666;
 }
+
+/* Profile detail page */
+.profile-detail {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 24px;
+  align-items: start;
+}
+
+.profile-avatar-large {
+  width: 180px;
+  height: 180px;
+  max-width: 100%;
+  border-radius: 18px;
+  object-fit: cover;
+  border: 1px solid #ddd;
+  background: #fff;
+}
+
+
+.profile-avatar-large.placeholder {
+  background: #eee;
+}
+
+.profile-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.profile-table th,
+.profile-table td {
+  border-bottom: 1px solid #eee;
+  padding: 10px 8px;
+  text-align: left;
+  vertical-align: top;
+}
+
+.profile-table th {
+  width: 140px;
+  color: #444;
+  font-weight: 700;
+}
+
+.placeholders {
+  margin-top: 18px;
+  padding: 12px;
+  border: 1px dashed #ccc;
+  border-radius: 12px;
+}
+
+.site-footer a {
+  color: #fff;
+  text-decoration: underline;
+}
+
+.footer-link {
+  margin-left: 8px;
+  opacity: 0.9;
+}
+
