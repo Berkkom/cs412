@@ -1,0 +1,92 @@
+/* Global layout */
+body {
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  margin: 0;
+  color: #111;
+}
+
+.container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 0 16px;
+}
+
+/* Header + footer */
+.site-header,
+.site-footer {
+  background: #111;
+  color: #fff;
+  padding: 16px 0;
+}
+
+.site-title {
+  margin: 0;
+  font-size: 22px;
+}
+
+.site-nav {
+  margin-top: 8px;
+}
+
+.site-nav a {
+  color: #fff;
+  text-decoration: none;
+  margin-right: 12px;
+  opacity: 0.9;
+}
+
+.site-nav a:hover {
+  opacity: 1;
+  text-decoration: underline;
+}
+
+/* Main content */
+.main {
+  padding: 24px 0;
+}
+
+.page-title {
+  margin: 0 0 16px 0;
+}
+
+/* Profiles grid/cards */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+.card {
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  padding: 12px;
+  background: #fff;
+}
+
+.card-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.avatar-placeholder {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: #eee;
+}
+
+.display-name {
+  font-weight: 700;
+}
+
+.username {
+  color: #666;
+}

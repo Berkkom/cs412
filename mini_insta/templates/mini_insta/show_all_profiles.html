@@ -1,0 +1,26 @@
+{% extends "mini_insta/base.html" %}
+
+{% block content %}
+  <h2 class="page-title">All Profiles</h2>
+
+  <div class="grid">
+    {% for p in profiles %}
+      <div class="card">
+        <div class="card-row">
+          {% if p.profile_image_url %}
+            <img class="avatar" src="{{ p.profile_image_url }}" alt="{{ p.username }} profile image" />
+          {% else %}
+            <div class="avatar-placeholder"></div>
+          {% endif %}
+
+          <div>
+            <div class="display-name">{{ p.display_name }}</div>
+            <div class="username">@{{ p.username }}</div>
+          </div>
+        </div>
+      </div>
+    {% empty %}
+      <p>No profiles yet. Create some in the admin.</p>
+    {% endfor %}
+  </div>
+{% endblock %}

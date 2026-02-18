@@ -1,0 +1,28 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>mini_insta</title>
+
+  <link rel="stylesheet" href="{% static 'mini_insta_styles.css' %}">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container">
+      <h1 class="site-title">mini_insta</h1>
+      <nav class="site-nav">
+        <a href="{% url 'show_all_profiles' %}">All Profiles</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="main">
+    <div class="container">
+      {% block content %}{% endblock %}
+    </div>
+  </main>
+
+</body>
+</html>
