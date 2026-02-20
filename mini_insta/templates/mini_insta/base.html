@@ -35,6 +35,9 @@ Description: Base template for mini_insta pages (shared header/footer and CSS).
       <span class="footer-link">
          <a href="{% url 'show_all_profiles' %}">Back to all profiles</a>
       </span>
+      {% if profile %}
+  •     <a href="{% url 'create_post' profile.pk %}">Create Post</a>
+      {% endif %}
     </div>
   </footer>
 </body>
