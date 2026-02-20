@@ -3,6 +3,7 @@
 # Description: Data models for the mini_insta app (e.g., Profile).
 
 from django.db import models
+from django.utils import timezone
 
 # Create your models here.
 class Profile(models.Model):
@@ -16,3 +17,33 @@ class Profile(models.Model):
     def __str__(self):
         """Return a simple string representation of this object."""
         return f'{self.username} created {self.join_date}'
+    
+    def get_all_posts(self):
+        """Return a QuerySet of all Posts for this Profile (newest first)."""
+        return Post.objects.filter(profile=self).order_by("-timestamp")
+
+class Post(models.Model):
+    """Model representing an Instagram-style post."""
+
+    profile = models.ForeignKey("Profile", on_delete=models.CASCADE)
+    timestamp = models.DateTimeField(default=timezone.now)
+    caption = models.TextField(blank=True)
+
+    def __str__(self):
+        """Return a simple string representation of this Post."""
+        return f"Post {self.pk} by {self.profile.username}"
+
+    def get_all_photos(self):
+        """Return a QuerySet of all Photos for this Post (ordered by timestamp)."""
+        return Photo.objects.filter(post=self).order_by("timestamp")
+
+class Photo(models.Model):
+    """Model representing a photo associated with a Post."""
+
+    post = models.ForeignKey("Post", on_delete=models.CASCADE)
+    image_url = models.URLField(max_length=500)
+    timestamp = models.DateTimeField(default=timezone.now)
+
+    def __str__(self):
+        """Return a simple string representation of this Photo."""
+        return f"Photo {self.pk} for Post {self.post.pk}"

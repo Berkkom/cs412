@@ -3,7 +3,7 @@
 # Description: Class-based views for mini_insta (list all profiles and show one profile).
 
 from django.views.generic import ListView, DetailView
-from .models import Profile
+from .models import Profile, Post
 
 
 class ProfileListView(ListView):
@@ -18,4 +18,10 @@ class ProfileDetailView(DetailView):
     model = Profile
     template_name = "mini_insta/show_profile.html"
     context_object_name = "profile"
+
+class PostDetailView(DetailView):
+    """Display a page showing a single Post record."""
+    model = Post
+    template_name = "mini_insta/show_post.html"
+    context_object_name = "post"
 

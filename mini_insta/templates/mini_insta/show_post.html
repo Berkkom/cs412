@@ -1,0 +1,27 @@
+{% extends "mini_insta/base.html" %}
+
+{% block content %}
+<div class="post-page">
+  <h2 class="page-title">Post by @{{ post.profile.username }}</h2>
+
+  <p><strong>Timestamp:</strong> {{ post.timestamp }}</p>
+
+  {% if post.caption %}
+    <p><strong>Caption:</strong> {{ post.caption }}</p>
+  {% else %}
+    <p><em>No caption.</em></p>
+  {% endif %}
+
+  <h3>Photos</h3>
+
+  <div class="photo-grid">
+    {% for photo in post.get_all_photos %}
+      <div class="photo-card">
+        <img class="post-photo" src="{{ photo.image_url }}" alt="Post photo">
+      </div>
+    {% empty %}
+      <p><em>No photos for this post.</em></p>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}
