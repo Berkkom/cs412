@@ -1,6 +1,6 @@
 # File: views.py
-# Author: Berk Komurcuoglu (berkkom@bu.edu), 2/18/2026
-# Description: Class-based views for mini_insta (list all profiles and show one profile).
+# Author: Berk Komurcuoglu (berkkom@bu.edu), 2/20/2026
+# Description: Class-based views for mini_insta (profiles, posts, and creating new posts).
 
 from django.views.generic import ListView, DetailView
 from .models import Profile, Post, Photo

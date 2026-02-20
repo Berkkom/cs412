@@ -1,6 +1,6 @@
 # File: models.py
-# Author: Berk Komurcuoglu (berkkom@bu.edu), 2/18/2026
-# Description: Data models for the mini_insta app (e.g., Profile).
+# Author: Berk Komurcuoglu (berkkom@bu.edu), 2/20/2026
+# Description: Data models for mini_insta (Profile, Post, Photo) and helper methods to access related objects.
 
 from django.db import models
 from django.utils import timezone
