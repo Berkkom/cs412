@@ -48,7 +48,7 @@ Description: Displays a single Profile record (profile detail page).
           <a class="post-link" href="{% url 'show_post' post.pk %}">
             <div class="post-tile">
               {% if first_photo %}
-                <img class="post-thumb" src="{{ first_photo.image_url }}" alt="Post thumbnail">
+                <img class="post-thumb" src="{{ first_photo.get_image_url }}" alt="Post thumbnail">
               {% else %}
                 <img class="post-thumb" src="https://via.placeholder.com/300?text=No+Image" alt="No image">
               {% endif %}

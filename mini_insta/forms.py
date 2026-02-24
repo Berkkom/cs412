@@ -5,11 +5,8 @@
 from django import forms
 from .models import *
 
-
 class CreatePostForm(forms.ModelForm):
-    """Form to create a Post (caption) plus one Photo (image_url)."""
-
-    image_url = forms.URLField(label="Image URL", required=True)
+    """Form to create a Post (caption only)."""
 
     class Meta:
         model = Post

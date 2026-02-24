@@ -22,7 +22,7 @@ Description: Displays a single Post (caption + timestamp) and all Photos associa
   <div class="photo-grid">
     {% for photo in post.get_all_photos %}
       <div class="photo-card">
-        <img class="post-photo" src="{{ photo.image_url }}" alt="Post photo">
+        <img class="post-photo" src="{{ photo.get_image_url }}" alt="Post photo">
       </div>
     {% empty %}
       <p><em>No photos for this post.</em></p>

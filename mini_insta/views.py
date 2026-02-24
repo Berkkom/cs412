@@ -40,17 +40,16 @@ class CreatePostView(CreateView):
         return context
 
     def form_valid(self, form):
-        """
-        Attach Profile FK to the Post before saving,
-        then create one Photo using the submitted image_url.
-        """
+        """Attach the Profile FK, save the Post, then create Photos from uploaded files."""
         profile = Profile.objects.get(pk=self.kwargs["pk"])
         form.instance.profile = profile
 
-        response = super().form_valid(form) 
+        response = super().form_valid(form)  # saves Post as self.object
 
-        image_url = form.cleaned_data.get("image_url")
-        Photo.objects.create(post=self.object, image_url=image_url)
+        # NEW: handle uploaded files (0 to many)
+        files = self.request.FILES.getlist("files")
+        for f in files:
+            Photo.objects.create(post=self.object, image_file=f)
 
         return response
 

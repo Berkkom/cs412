@@ -8,10 +8,17 @@ Description: Form page to create a new Post for a specific Profile (caption + im
 {% block content %}
   <h2 class="page-title">Create a Post for {{ profile.display_name }}</h2>
 
-  <form method="POST" action="{% url 'create_post' profile.pk %}">
+  <form method="POST"
+        action="{% url 'create_post' profile.pk %}"
+        enctype="multipart/form-data">
     {% csrf_token %}
 
     {{ form.as_p }}
+
+    <p>
+      <label for="id_files">Upload photo(s):</label><br>
+      <input type="file" name="files" id="id_files" multiple>
+    </p>
 
     <button type="submit">Create Post</button>
     <a href="{% url 'show_profile' profile.pk %}">Cancel</a>
