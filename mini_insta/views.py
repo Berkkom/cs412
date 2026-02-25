@@ -4,9 +4,9 @@
 
 from django.views.generic import ListView, DetailView
 from .models import Profile, Post, Photo
-from django.views.generic.edit import CreateView, UpdateView
+from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from .forms import CreatePostForm, UpdateProfileForm
-
+from django.urls import reverse
 
 class ProfileListView(ListView):
     """Display a page showing all Profile records."""
@@ -57,4 +57,27 @@ class UpdateProfileView(UpdateView):
     model = Profile
     form_class = UpdateProfileForm
     template_name = "mini_insta/update_profile_form.html"
+    
+class DeletePostView(DeleteView):
+    """Delete an existing Post after confirmation."""
+    model = Post
+    template_name = "mini_insta/delete_post_form.html"
 
+    def get_context_data(self, **kwargs):
+        """Provide post and profile in the context for the delete template."""
+        context = super().get_context_data(**kwargs)
+        context["post"] = self.object
+        context["profile"] = self.object.profile
+        return context
+
+    def get_success_url(self):
+        """After deleting a post, return to the creator's profile page."""
+        return reverse("show_profile", kwargs={"pk": self.object.profile.pk})
+
+
+class UpdatePostView(UpdateView):
+    """Update the caption of an existing Post."""
+    model = Post
+    fields = ["caption"]  # only caption is editable
+    template_name = "mini_insta/update_post_form.html"
+    # Redirect will use Post.get_absolute_url() (which you already added)

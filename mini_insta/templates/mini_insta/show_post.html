@@ -7,6 +7,11 @@ Description: Displays a single Post (caption + timestamp) and all Photos associa
 
 {% block content %}
 <div class="post-page">
+  <p>
+    <a href="{% url 'update_post' post.pk %}">Update</a>
+    •
+    <a href="{% url 'delete_post' post.pk %}">Delete</a>
+  </p>
   <h2 class="page-title">Post by @{{ post.profile.username }}</h2>
 
   <p><strong>Timestamp:</strong> {{ post.timestamp }}</p>
