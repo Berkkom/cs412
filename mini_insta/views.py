@@ -57,7 +57,7 @@ class UpdateProfileView(UpdateView):
     model = Profile
     form_class = UpdateProfileForm
     template_name = "mini_insta/update_profile_form.html"
-    
+
 class DeletePostView(DeleteView):
     """Delete an existing Post after confirmation."""
     model = Post
@@ -78,6 +78,18 @@ class DeletePostView(DeleteView):
 class UpdatePostView(UpdateView):
     """Update the caption of an existing Post."""
     model = Post
-    fields = ["caption"]  # only caption is editable
+    fields = ["caption"]  
     template_name = "mini_insta/update_post_form.html"
-    # Redirect will use Post.get_absolute_url() (which you already added)
+
+class ShowFollowersDetailView(DetailView):
+    """Show the followers list for a single Profile."""
+    model = Profile
+    template_name = "mini_insta/show_followers.html"
+    context_object_name = "profile"
+
+
+class ShowFollowingDetailView(DetailView):
+    """Show the following list for a single Profile."""
+    model = Profile
+    template_name = "mini_insta/show_following.html"
+    context_object_name = "profile"

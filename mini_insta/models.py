@@ -27,6 +27,24 @@ class Profile(models.Model):
         """Return the URL for this Profile's detail page (used after updates)."""
         return reverse("show_profile", kwargs={"pk": self.pk})
 
+    def get_followers(self):
+        """Return a list of Profiles that follow this profile."""
+        follows = Follow.objects.filter(profile=self).order_by("-timestamp")
+        return [f.follower_profile for f in follows]
+
+    def get_num_followers(self):
+        """Return the number of followers this profile has."""
+        return Follow.objects.filter(profile=self).count()
+
+    def get_following(self):
+        """Return a list of Profiles that this profile is following."""
+        follows = Follow.objects.filter(follower_profile=self).order_by("-timestamp")
+        return [f.profile for f in follows]
+
+    def get_num_following(self):
+        """Return the number of profiles this profile follows."""
+        return Follow.objects.filter(follower_profile=self).count()
+
 class Post(models.Model):
     """Model representing an Instagram-style post."""
 
@@ -46,6 +64,18 @@ class Post(models.Model):
         """Return the URL to view this post."""
         return reverse("show_post", kwargs={"pk": self.pk})
 
+    def get_all_comments(self):
+        """Return all Comments for this Post (oldest first)."""
+        return Comment.objects.filter(post=self).order_by("timestamp")
+
+    def get_likes(self):
+        """Return all Likes for this Post."""
+        return Like.objects.filter(post=self)
+
+    def get_num_likes(self):
+        """Return the number of likes for this Post."""
+        return Like.objects.filter(post=self).count()
+    
 class Photo(models.Model):
     """Model representing a photo associated with a Post."""
 
@@ -77,3 +107,41 @@ class Photo(models.Model):
             return self.image_file.url
         
         return ""
+
+class Follow(models.Model):
+    """Model representing one Profile following another Profile."""
+
+    profile = models.ForeignKey("Profile", on_delete=models.CASCADE, related_name="profile")
+
+    follower_profile = models.ForeignKey("Profile", on_delete=models.CASCADE, related_name="follower_profile")
+
+    timestamp = models.DateTimeField(default=timezone.now)
+
+    def __str__(self):
+        """Readable representation of this follow relation."""
+        return f"@{self.follower_profile.username} follows @{self.profile.username}"
+
+
+class Comment(models.Model):
+    """Model representing a comment on a Post."""
+
+    post = models.ForeignKey("Post", on_delete=models.CASCADE)
+    profile = models.ForeignKey("Profile", on_delete=models.CASCADE)
+    timestamp = models.DateTimeField(default=timezone.now)
+    text = models.TextField()
+
+    def __str__(self):
+        """Readable representation of this comment."""
+        return f"Comment by @{self.profile.username} on Post {self.post.pk}"
+
+
+class Like(models.Model):
+    """Model representing a like on a Post."""
+
+    post = models.ForeignKey("Post", on_delete=models.CASCADE)
+    profile = models.ForeignKey("Profile", on_delete=models.CASCADE)
+    timestamp = models.DateTimeField(default=timezone.now)
+
+    def __str__(self):
+        """Readable representation of this like."""
+        return f"@{self.profile.username} likes Post {self.post.pk}"

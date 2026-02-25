@@ -24,6 +24,15 @@ Description: Displays a single Profile record (profile detail page).
       <p>
         <a href="{% url 'update_profile' profile.pk %}">Update Profile</a>
       </p>
+      <p>
+        <a href="{% url 'show_followers' profile.pk %}">
+          Followers: {{ profile.get_num_followers }}
+        </a>
+        •
+        <a href="{% url 'show_following' profile.pk %}">
+          Following: {{ profile.get_num_following }}
+        </a>
+      </p>
       <table class="profile-table">
         <tr>
           <th>Username</th>
