@@ -1,6 +1,7 @@
 # File: models.py
-# Author: Berk Komurcuoglu (berkkom@bu.edu), 2/20/2026
-# Description: Data models for mini_insta (Profile, Post, Photo) and helper methods to access related objects.
+# Author: Berk Komurcuoglu (berkkom@bu.edu), 2/24/2026
+# Description: Data models for mini_insta (Profile, Post, Photo) plus social features
+# (Follow, Comment, Like) and helper/accessor methods used by views/templates.
 
 from django.db import models
 from django.utils import timezone

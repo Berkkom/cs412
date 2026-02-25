@@ -1,6 +1,6 @@
 # File: forms.py
-# Author: Berk Komurcuoglu (berkkom@bu.edu), 2/20/2026
-# Description: Django forms for mini_insta, including CreatePostForm for creating a Post and one Photo URL.
+# Author: Berk Komurcuoglu (berkkom@bu.edu), 2/24/2026
+# Description: Django forms for mini_insta (creating posts, updating profiles).
 
 from django import forms
 from .models import *

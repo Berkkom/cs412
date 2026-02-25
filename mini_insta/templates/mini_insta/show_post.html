@@ -1,7 +1,7 @@
 <!--
 File: show_post.html
-Author: Berk Komurcuoglu (berkkom@bu.edu), 2/20/2026
-Description: Displays a single Post (caption + timestamp) and all Photos associated with that Post.
+Author: Berk Komurcuoglu (berkkom@bu.edu), 2/24/2026
+Description: Displays a single Post with photos, like count, comments, and update/delete links.
 -->
 {% extends "mini_insta/base.html" %}
 
@@ -25,7 +25,7 @@ Description: Displays a single Post (caption + timestamp) and all Photos associa
   {% endif %}
 
   <h3>Comments</h3>
-  
+
   <ul>
     {% for c in post.get_all_comments %}
       <li>

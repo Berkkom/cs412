@@ -1,12 +1,16 @@
 # File: views.py
-# Author: Berk Komurcuoglu (berkkom@bu.edu), 2/20/2026
-# Description: Class-based views for mini_insta (profiles, posts, and creating new posts).
+# Author: Berk Komurcuoglu (berkkom@bu.edu), 2/24/2026
+# Description: Class-based views for mini_insta, including profile/post display,
+# creating/updating/deleting posts, updating profiles, follower/following pages,
+# post feed, and search.
 
 from django.views.generic import ListView, DetailView
 from .models import Profile, Post, Photo
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from .forms import CreatePostForm, UpdateProfileForm
 from django.urls import reverse
+from django.shortcuts import render
+from django.db.models import Q
 
 class ProfileListView(ListView):
     """Display a page showing all Profile records."""
@@ -119,4 +123,49 @@ class PostDetailView(DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["profile"] = self.object.profile
+        return context
+
+class SearchView(ListView):
+    """
+    Search posts (caption) and profiles (username/display_name/bio_text)
+    on behalf of a given Profile (pk from URL).
+    """
+    template_name = "mini_insta/search_results.html"
+    context_object_name = "posts"
+
+    def dispatch(self, request, *args, **kwargs):
+        if "query" not in request.GET:
+            profile = Profile.objects.get(pk=self.kwargs["pk"])
+            return render(request, "mini_insta/search.html", {"profile": profile})
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_queryset(self):
+        """Return the QuerySet of Posts whose caption contains the query."""
+        q = self.request.GET.get("query", "").strip()
+        if not q:
+            return Post.objects.none()
+        return Post.objects.filter(caption__icontains=q).order_by("-timestamp")
+
+    def get_context_data(self, **kwargs):
+        """Add profile, query, matching posts, and matching profiles to context."""
+        context = super().get_context_data(**kwargs)
+
+        profile = Profile.objects.get(pk=self.kwargs["pk"])
+        q = self.request.GET.get("query", "").strip()
+
+        matching_posts = self.get_queryset()
+
+        if q:
+            matching_profiles = Profile.objects.filter(
+                Q(username__icontains=q) |
+                Q(display_name__icontains=q) |
+                Q(bio_text__icontains=q)
+            )
+        else:
+            matching_profiles = Profile.objects.none()
+
+        context["profile"] = profile
+        context["query"] = q
+        context["posts"] = matching_posts
+        context["profiles"] = matching_profiles
         return context

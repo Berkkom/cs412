@@ -1,0 +1,43 @@
+<!--
+File: search_results.html
+Author: Berk Komurcuoglu (berkkom@bu.edu), 2/24/2026
+Description: Displays search results for matching Profiles and Posts.
+-->
+
+{% extends "mini_insta/base.html" %}
+
+{% block content %}
+  <h2 class="page-title">Search Results</h2>
+
+  <p>
+    Results for: <strong>{{ query }}</strong>
+    • <a href="{% url 'search' profile.pk %}">New search</a>
+    • <a href="{% url 'show_profile' profile.pk %}">Back to profile</a>
+  </p>
+
+  <h3>Matching Profiles</h3>
+  <ul>
+    {% for p in profiles %}
+      <li>
+        <a href="{% url 'show_profile' p.pk %}">@{{ p.username }}</a>
+        — {{ p.display_name }}
+      </li>
+    {% empty %}
+      <li><em>No matching profiles.</em></li>
+    {% endfor %}
+  </ul>
+
+  <h3>Matching Posts</h3>
+  <ul>
+    {% for post in posts %}
+      <li>
+        <a href="{% url 'show_post' post.pk %}">Post {{ post.pk }}</a>
+        by <a href="{% url 'show_profile' post.profile.pk %}">@{{ post.profile.username }}</a>
+        — {{ post.timestamp }}
+        {% if post.caption %}<br>{{ post.caption }}{% endif %}
+      </li>
+    {% empty %}
+      <li><em>No matching posts.</em></li>
+    {% endfor %}
+  </ul>
+{% endblock %}

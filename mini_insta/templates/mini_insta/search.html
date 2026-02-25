@@ -1,0 +1,19 @@
+<!--
+File: search.html
+Author: Berk Komurcuoglu (berkkom@bu.edu), 2/24/2026
+Description: Displays a search form (GET) to search profiles and posts by query text.
+-->
+
+{% extends "mini_insta/base.html" %}
+
+{% block content %}
+  <h2 class="page-title">Search</h2>
+
+  <form method="GET" action="{% url 'search' profile.pk %}">
+    <label for="id_query">Search for:</label><br>
+    <input type="text" id="id_query" name="query" placeholder="Type keywords..." required>
+    <button type="submit">Search</button>
+  </form>
+
+  <p><a href="{% url 'show_profile' profile.pk %}">Back to profile</a></p>
+{% endblock %}

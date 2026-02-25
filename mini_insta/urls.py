@@ -1,9 +1,10 @@
 # File: urls.py
-# Author: Berk Komurcuoglu (berkkom@bu.edu), 2/20/2026
-# Description: URL routes for mini_insta (profiles, posts, and creating new posts).
+# Author: Berk Komurcuoglu (berkkom@bu.edu), 2/24/2026
+# Description: URL routes for mini_insta (profiles, posts, feed, followers/following,
+# search, create/update/delete operations).
 
 from django.urls import path
-from .views import ProfileListView, ProfileDetailView, PostDetailView, CreatePostView, UpdateProfileView, DeletePostView, UpdatePostView, ShowFollowersDetailView, ShowFollowingDetailView, PostFeedListView
+from .views import ProfileListView, ProfileDetailView, PostDetailView, CreatePostView, UpdateProfileView, DeletePostView, UpdatePostView, ShowFollowersDetailView, ShowFollowingDetailView, PostFeedListView, SearchView
 
 urlpatterns = [
     path("", ProfileListView.as_view(), name="show_all_profiles"),
@@ -16,4 +17,5 @@ urlpatterns = [
     path("profile/<int:pk>/followers", ShowFollowersDetailView.as_view(), name="show_followers"),
     path("profile/<int:pk>/following", ShowFollowingDetailView.as_view(), name="show_following"),
     path("profile/<int:pk>/feed", PostFeedListView.as_view(), name="show_feed"),
+    path("profile/<int:pk>/search", SearchView.as_view(), name="search"),
 ]
