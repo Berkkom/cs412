@@ -45,6 +45,11 @@ class Profile(models.Model):
         """Return the number of profiles this profile follows."""
         return Follow.objects.filter(follower_profile=self).count()
 
+    def get_post_feed(self):
+        """Return Posts from Profiles that this Profile follows, newest first."""
+        following_profiles = Follow.objects.filter(follower_profile=self).values_list("profile", flat=True)
+        return Post.objects.filter(profile__in=following_profiles).order_by("-timestamp")
+
 class Post(models.Model):
     """Model representing an Instagram-style post."""
 

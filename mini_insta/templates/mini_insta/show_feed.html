@@ -1,0 +1,63 @@
+{% extends "mini_insta/base.html" %}
+
+{% block content %}
+  <h2 class="page-title">Feed for {{ profile.display_name }}</h2>
+
+  <p>
+    <a href="{% url 'show_profile' profile.pk %}">Back to profile</a>
+  </p>
+
+  {% for post in posts %}
+    <div class="feed-card">
+      <div class="feed-header">
+        {% if post.profile.profile_image_url %}
+          <img class="feed-avatar" src="{{ post.profile.profile_image_url }}" alt="Profile image">
+        {% else %}
+          <div class="feed-avatar placeholder"></div>
+        {% endif %}
+
+        <div>
+          <div class="feed-name">
+            <a href="{% url 'show_profile' post.profile.pk %}">
+              {{ post.profile.display_name }}
+            </a>
+          </div>
+          <div class="feed-username">@{{ post.profile.username }} • {{ post.timestamp }}</div>
+        </div>
+      </div>
+
+      {% with first_photo=post.get_all_photos.first %}
+        <a href="{% url 'show_post' post.pk %}">
+            <div class="feed-photo-frame">
+            {% if first_photo %}
+                <img class="feed-photo" src="{{ first_photo.get_image_url }}" alt="Post photo">
+            {% else %}
+                <img class="feed-photo" src="https://via.placeholder.com/800?text=No+Image" alt="No image">
+            {% endif %}
+            </div>
+        </a>
+      {% endwith %}
+
+      <div class="feed-body">
+        <p><strong>Likes:</strong> {{ post.get_num_likes }}</p>
+
+        {% if post.caption %}
+          <p><strong>Caption:</strong> {{ post.caption }}</p>
+        {% endif %}
+
+        <div class="feed-comments">
+          <strong>Comments</strong>
+          <ul>
+            {% for c in post.get_all_comments %}
+              <li><strong>@{{ c.profile.username }}</strong>: {{ c.text }}</li>
+            {% empty %}
+              <li><em>No comments yet.</em></li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+    </div>
+  {% empty %}
+    <p><em>No posts in your feed yet. Follow someone!</em></p>
+  {% endfor %}
+{% endblock %}

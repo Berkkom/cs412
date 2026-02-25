@@ -16,14 +16,20 @@ Description: Base template for mini_insta pages (shared header/footer and CSS).
 <body>
   <header class="site-header">
     <div class="container">
-      <h1 class="site-title">mini_insta</h1>
+      <h1 class="site-title"><a href="{% url 'show_all_profiles' %}">mini_insta</a></h1>
       <nav class="site-nav">
         <a href="{% url 'show_all_profiles' %}">All Profiles</a>
+        {% if profile %}
+          <a href="{% url 'show_feed' profile.pk %}">Home</a>
+          <a href="{% url 'show_profile' profile.pk %}">Profile</a>
+          <a href="{% url 'create_post' profile.pk %}">Create Post</a>
+        {% else %}
+          <a href="{% url 'show_all_profiles' %}">All Profiles</a>
+        {% endif %}
       </nav>
     </div>
   </header>
 
-  <!-- THIS IS THE MISSING PART -->
   <main class="main">
     <div class="container">
       {% block content %}{% endblock %}
@@ -32,11 +38,13 @@ Description: Base template for mini_insta pages (shared header/footer and CSS).
 
   <footer class="site-footer">
     <div class="container">
-      <span class="footer-link">
-         <a href="{% url 'show_all_profiles' %}">Back to all profiles</a>
-      </span>
+      <a href="{% url 'show_all_profiles' %}">All Profiles</a>
       {% if profile %}
-  •     <a href="{% url 'create_post' profile.pk %}">Create Post</a>
+        <a href="{% url 'show_feed' profile.pk %}">Home</a>
+        • <a href="{% url 'show_profile' profile.pk %}">Profile</a>
+        • <a href="{% url 'create_post' profile.pk %}">Create Post</a>
+      {% else %}
+        <a href="{% url 'show_all_profiles' %}">All Profiles</a>
       {% endif %}
     </div>
   </footer>
