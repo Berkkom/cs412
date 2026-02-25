@@ -4,8 +4,8 @@
 
 from django.views.generic import ListView, DetailView
 from .models import Profile, Post, Photo
-from django.views.generic.edit import CreateView
-from .forms import CreatePostForm
+from django.views.generic.edit import CreateView, UpdateView
+from .forms import CreatePostForm, UpdateProfileForm
 
 
 class ProfileListView(ListView):
@@ -46,10 +46,15 @@ class CreatePostView(CreateView):
 
         response = super().form_valid(form)  # saves Post as self.object
 
-        # NEW: handle uploaded files (0 to many)
         files = self.request.FILES.getlist("files")
         for f in files:
             Photo.objects.create(post=self.object, image_file=f)
 
         return response
+
+class UpdateProfileView(UpdateView):
+    """Update an existing Profile record."""
+    model = Profile
+    form_class = UpdateProfileForm
+    template_name = "mini_insta/update_profile_form.html"
 

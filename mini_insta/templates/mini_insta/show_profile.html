@@ -21,6 +21,9 @@ Description: Displays a single Profile record (profile detail page).
     </div>
 
     <div class="profile-right">
+      <p>
+        <a href="{% url 'update_profile' profile.pk %}">Update Profile</a>
+      </p>
       <table class="profile-table">
         <tr>
           <th>Username</th>

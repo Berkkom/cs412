@@ -23,6 +23,10 @@ class Profile(models.Model):
         """Return a QuerySet of all Posts for this Profile (newest first)."""
         return Post.objects.filter(profile=self).order_by("-timestamp")
 
+    def get_absolute_url(self):
+        """Return the URL for this Profile's detail page (used after updates)."""
+        return reverse("show_profile", kwargs={"pk": self.pk})
+
 class Post(models.Model):
     """Model representing an Instagram-style post."""
 
