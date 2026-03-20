@@ -1,0 +1,36 @@
+<!--
+File: base.html
+Author: Berk Komurcuoglu (berkkom@bu.edu), 3/19/2026
+Description: Base template for the voter_analytics application that
+provides the shared page layout and navigation links.
+-->
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Voter Analytics{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'voter_analytics_styles.css' %}">
+</head>
+<body>
+    <header class="site-header">
+        <div class="container header-inner">
+            <div>
+                <h1 class="site-title">Voter Analytics</h1>
+                <p class="site-subtitle">Newton Voter Data Explorer</p>
+            </div>
+
+            <nav class="main-nav">
+                <a href="{% url 'voters' %}">Voters</a>
+                <a href="{% url 'graphs' %}">Graphs</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        {% block content %}{% endblock %}
+    </main>
+</body>
+</html>

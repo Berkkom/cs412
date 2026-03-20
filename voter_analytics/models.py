@@ -1,11 +1,19 @@
+# File: models.py
+# Author: Berk Komurcuoglu (berkkom@bu.edu), 3/19/2026
+# Description: Model definitions and data-loading utilities for the
+# voter_analytics application.
+
 from django.db import models
 from django.conf import settings
 from pathlib import Path
 import csv
 from datetime import datetime
+from urllib.parse import quote_plus
 
 
 class Voter(models.Model):
+    """Represent a registered voter in Newton, Massachusetts."""
+
     last_name = models.CharField(max_length=100)
     first_name = models.CharField(max_length=100)
 
@@ -30,14 +38,26 @@ class Voter(models.Model):
     voter_score = models.IntegerField(default=0)
 
     def __str__(self):
+        """Return a readable string representation of this voter."""
         return f"{self.first_name} {self.last_name} ({self.street_number} {self.street_name})"
+
+    def street_address(self):
+        """Return the voter's street address, including apartment if present."""
+        if self.apartment_number:
+            return f"{self.street_number} {self.street_name}, Apt {self.apartment_number}"
+        return f"{self.street_number} {self.street_name}"
+
+    def full_address(self):
+        """Return the voter's complete mailing address in Newton, MA."""
+        return f"{self.street_address()}, Newton, MA {self.zip_code}"
+
+    def google_maps_url(self):
+        """Return a Google Maps search URL for the voter's address."""
+        return f"https://www.google.com/maps/search/?api=1&query={quote_plus(self.full_address())}"
 
 
 def parse_date(date_str):
-    """
-    Convert a string date from the CSV into a Python date object.
-    Tries a few common formats.
-    """
+    """Convert a CSV date string into a Python date object, if possible."""
     if not date_str or date_str.strip() == "":
         return None
 
@@ -53,10 +73,7 @@ def parse_date(date_str):
 
 
 def parse_bool(value):
-    """
-    Convert CSV election participation values into True/False.
-    Handles values like TRUE, T, Y, YES, 1.
-    """
+    """Convert a CSV election-participation value into True or False."""
     if not value:
         return False
 
@@ -65,23 +82,18 @@ def parse_bool(value):
 
 
 def load_data():
-    """
-    Load voter data from newton_voters.csv into the database.
-    Assumes the CSV file is located in the Django project base directory.
-    """
-
+    """Load voter records from newton_voters.csv into the database."""
     csv_file = Path(settings.BASE_DIR) / "newton_voters.csv"
 
     if not csv_file.exists():
         print(f"CSV file not found: {csv_file}")
         return
 
-    # Delete old records so repeated imports do not create duplicates
+    # Delete existing records so repeated imports do not create duplicates.
     Voter.objects.all().delete()
 
     with open(csv_file, newline="", encoding="utf-8-sig") as f:
         reader = csv.DictReader(f)
-
         voters_to_create = []
 
         for row in reader:

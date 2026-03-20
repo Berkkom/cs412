@@ -1,0 +1,113 @@
+<!--
+File: voter_detail.html
+Author: Berk Komurcuoglu (berkkom @bu.edu), 3/19/2026
+Description: Template for displaying detailed information about a
+single voter.
+-->
+
+{% extends 'voter_analytics/base.html' %}
+
+{% block title %}Voter Detail{% endblock %}
+
+{% block content %}
+<section class="card">
+    <div class="summary-bar">
+        <div>
+            <h2>{{ voter.first_name }} {{ voter.last_name }}</h2>
+            <p class="muted">Detailed voter profile</p>
+        </div>
+
+        <div class="button-row">
+            <a href="{% url 'voters' %}" class="btn btn-secondary">Back to List</a>
+            <a href="{{ voter.google_maps_url }}" target="_blank" class="btn btn-primary">Open in Google Maps</a>
+        </div>
+    </div>
+
+    <div class="detail-grid">
+        <div class="detail-item">
+            <span class="detail-label">First Name</span>
+            {{ voter.first_name }}
+        </div>
+
+        <div class="detail-item">
+            <span class="detail-label">Last Name</span>
+            {{ voter.last_name }}
+        </div>
+
+        <div class="detail-item">
+            <span class="detail-label">Street Number</span>
+            {{ voter.street_number }}
+        </div>
+
+        <div class="detail-item">
+            <span class="detail-label">Street Name</span>
+            {{ voter.street_name }}
+        </div>
+
+        <div class="detail-item">
+            <span class="detail-label">Apartment Number</span>
+            {{ voter.apartment_number }}
+        </div>
+
+        <div class="detail-item">
+            <span class="detail-label">Zip Code</span>
+            {{ voter.zip_code }}
+        </div>
+
+        <div class="detail-item">
+            <span class="detail-label">Full Address</span>
+            {{ voter.full_address }}
+        </div>
+
+        <div class="detail-item">
+            <span class="detail-label">Date of Birth</span>
+            {{ voter.date_of_birth }}
+        </div>
+
+        <div class="detail-item">
+            <span class="detail-label">Date of Registration</span>
+            {{ voter.date_of_registration }}
+        </div>
+
+        <div class="detail-item">
+            <span class="detail-label">Party Affiliation</span>
+            {{ voter.party_affiliation }}
+        </div>
+
+        <div class="detail-item">
+            <span class="detail-label">Precinct Number</span>
+            {{ voter.precinct_number }}
+        </div>
+
+        <div class="detail-item">
+            <span class="detail-label">Voter Score</span>
+            {{ voter.voter_score }}
+        </div>
+
+        <div class="detail-item">
+            <span class="detail-label">Voted 2020 State</span>
+            {{ voter.v20state }}
+        </div>
+
+        <div class="detail-item">
+            <span class="detail-label">Voted 2021 Town</span>
+            {{ voter.v21town }}
+        </div>
+
+        <div class="detail-item">
+            <span class="detail-label">Voted 2021 Primary</span>
+            {{ voter.v21primary }}
+        </div>
+
+        <div class="detail-item">
+            <span class="detail-label">Voted 2022 General</span>
+            {{ voter.v22general }}
+        </div>
+
+        <div class="detail-item">
+            <span class="detail-label">Voted 2023 Town</span>
+            {{ voter.v23town }}
+        </div>
+    </div>
+</section>
+{% endblock %}
