@@ -10,30 +10,42 @@
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             max-width: 800px;
-            margin: 40px auto;
-            padding: 0 20px;
-            background-color: #fefefe;
-            color: #333;
+            margin: 0 auto;
+            padding: 40px 20px;
+            background-color: #121212;
+            color: #FFFFFF;
         }
-        h1 { color: #2c3e50; }
+        h1 { color: #1DB954; }
+        h2 { color: #FFFFFF; }
         nav { margin-bottom: 30px; }
         nav a {
-            margin-right: 15px;
+            display: inline-block;
+            margin-right: 10px;
             text-decoration: none;
-            color: #3498db;
+            color: #FFFFFF;
             font-weight: bold;
+            background-color: #282828;
+            padding: 8px 16px;
+            border-radius: 20px;
+            transition: background-color 0.2s;
         }
-        nav a:hover { text-decoration: underline; }
+        nav a:hover {
+            background-color: #1DB954;
+            text-decoration: none;
+        }
         .joke-card, .picture-card {
-            background: #f9f9f9;
-            border: 1px solid #ddd;
+            background: #282828;
+            border: none;
+            border-left: 4px solid #1DB954;
             border-radius: 8px;
             padding: 20px;
             margin-bottom: 20px;
         }
-        .joke-text { font-size: 1.2em; font-style: italic; }
-        .contributor { color: #777; font-size: 0.9em; margin-top: 8px; }
+        .joke-text { font-size: 1.2em; font-style: italic; color: #FFFFFF; }
+        .contributor { color: #B3B3B3; font-size: 0.9em; margin-top: 8px; }
         img { max-width: 100%; border-radius: 8px; }
+        a { color: #1DB954; }
+        a:hover { color: #1ed760; }
     </style>
 </head>
 <body>
