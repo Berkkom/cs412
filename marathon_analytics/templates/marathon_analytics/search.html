@@ -1,0 +1,32 @@
+<!-- marathon_analytics/templates/marathon_analytics/search.html -->
+<h1>Search Form</h1>
+ 
+ 
+<table>
+<form action="{% url 'results_list' %}" method="GET">
+    <tr>
+        <th>Surname:</th>
+        <td><input type="text" name="last_name"></td>
+    </tr>
+    <tr>
+        <th>City:</th>
+        <td><input type="text" name="city"></td>
+    </tr>
+    <tr>
+        <th>Citizenship:</th>
+        <td><input type="text" name="ctz"></td>
+    </tr>
+    <tr>
+        <th>Division:</th>
+        <td><input type="text" name="division"></td>
+    </tr>
+    <tr>
+        <th>Gender:</th>
+        <td><input type="text" name="gender"></td>
+    </tr>
+    <tr>
+        <td><input type="submit"></td>
+        <td></td>
+    </tr>
+</form>
+</table>
