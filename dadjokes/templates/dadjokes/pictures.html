@@ -1,0 +1,16 @@
+<!-- File: pictures.html -->
+<!-- Author: Berk Komurcuoglu (berkkom@bu.edu) 4/3/2026 -->
+<!-- Description: Template that displays a listing of all Pictures. -->
+{% extends 'dadjokes/base.html' %}
+{% block title %}All Pictures{% endblock %}
+{% block content %}
+<h2>All Pictures</h2>
+{% for picture in pictures %}
+<div class="picture-card">
+    <img src="{{ picture.image_url }}" alt="Funny picture">
+    <p class="contributor">— contributed by {{ picture.contributor }} | <a href="{% url 'one_picture' picture.pk %}">View</a></p>
+</div>
+{% empty %}
+<p>No pictures yet!</p>
+{% endfor %}
+{% endblock %}

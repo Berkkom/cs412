@@ -1,0 +1,48 @@
+<!-- File: base.html -->
+<!-- Author: Berk Komurcuoglu (berkkom@bu.edu) 4/3/2026 -->
+<!-- Description: Base template for the dadjokes app. Provides shared -->
+<!-- layout, styling, and navigation used by all other templates. -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{% block title %}Dad Jokes{% endblock %}</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 0 20px;
+            background-color: #fefefe;
+            color: #333;
+        }
+        h1 { color: #2c3e50; }
+        nav { margin-bottom: 30px; }
+        nav a {
+            margin-right: 15px;
+            text-decoration: none;
+            color: #3498db;
+            font-weight: bold;
+        }
+        nav a:hover { text-decoration: underline; }
+        .joke-card, .picture-card {
+            background: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .joke-text { font-size: 1.2em; font-style: italic; }
+        .contributor { color: #777; font-size: 0.9em; margin-top: 8px; }
+        img { max-width: 100%; border-radius: 8px; }
+    </style>
+</head>
+<body>
+    <h1>Dad Jokes</h1>
+    <nav>
+        <a href="{% url 'random_home' %}">Random</a>
+        <a href="{% url 'all_jokes' %}">All Jokes</a>
+        <a href="{% url 'all_pictures' %}">All Pictures</a>
+    </nav>
+    {% block content %}{% endblock %}
+</body>
+</html>

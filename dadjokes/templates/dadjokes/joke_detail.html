@@ -1,0 +1,13 @@
+<!-- File: joke_detail.html -->
+<!-- Author: Berk Komurcuoglu (berkkom@bu.edu) 4/3/2026 -->
+<!-- Description: Template that displays a single Joke by its primary key. -->
+{% extends 'dadjokes/base.html' %}
+{% block title %}Joke #{{ joke.pk }}{% endblock %}
+{% block content %}
+<h2>Joke #{{ joke.pk }}</h2>
+<div class="joke-card">
+    <p class="joke-text">{{ joke.text }}</p>
+    <p class="contributor">— contributed by {{ joke.contributor }}</p>
+    <p class="contributor">Created: {{ joke.created }}</p>
+</div>
+{% endblock %}

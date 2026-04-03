@@ -1,0 +1,13 @@
+<!-- File: picture_detail.html -->
+<!-- Author: Berk Komurcuoglu (berkkom@bu.edu) 4/3/2026 -->
+<!-- Description: Template that displays a single Picture by its primary key. -->
+{% extends 'dadjokes/base.html' %}
+{% block title %}Picture #{{ picture.pk }}{% endblock %}
+{% block content %}
+<h2>Picture #{{ picture.pk }}</h2>
+<div class="picture-card">
+    <img src="{{ picture.image_url }}" alt="Funny picture">
+    <p class="contributor">— contributed by {{ picture.contributor }}</p>
+    <p class="contributor">Created: {{ picture.created }}</p>
+</div>
+{% endblock %}

@@ -1,0 +1,16 @@
+<!-- File: jokes.html -->
+<!-- Author: Berk Komurcuoglu (berkkom@bu.edu) 4/3/2026 -->
+<!-- Description: Template that displays a listing of all Jokes. -->
+{% extends 'dadjokes/base.html' %}
+{% block title %}All Jokes{% endblock %}
+{% block content %}
+<h2>All Jokes</h2>
+{% for joke in jokes %}
+<div class="joke-card">
+    <p class="joke-text">{{ joke.text }}</p>
+    <p class="contributor">— contributed by {{ joke.contributor }} | <a href="{% url 'one_joke' joke.pk %}">View</a></p>
+</div>
+{% empty %}
+<p>No jokes yet!</p>
+{% endfor %}
+{% endblock %}

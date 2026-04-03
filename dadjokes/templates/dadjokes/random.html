@@ -1,0 +1,26 @@
+<!-- File: random.html -->
+<!-- Author: Berk Komurcuoglu (berkkom@bu.edu) 4/3/2026 -->
+<!-- Description: Template that displays one random Joke and one random Picture. -->
+{% extends 'dadjokes/base.html' %}
+{% block title %}Random Dad Joke{% endblock %}
+{% block content %}
+<h2>Random Joke</h2>
+{% if joke %}
+<div class="joke-card">
+    <p class="joke-text">{{ joke.text }}</p>
+    <p class="contributor">— contributed by {{ joke.contributor }}</p>
+</div>
+{% else %}
+<p>No jokes yet!</p>
+{% endif %}
+
+<h2>Random Picture</h2>
+{% if picture %}
+<div class="picture-card">
+    <img src="{{ picture.image_url }}" alt="Funny picture">
+    <p class="contributor">— contributed by {{ picture.contributor }}</p>
+</div>
+{% else %}
+<p>No pictures yet!</p>
+{% endif %}
+{% endblock %}
