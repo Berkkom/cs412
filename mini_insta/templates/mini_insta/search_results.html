@@ -11,8 +11,8 @@ Description: Displays search results for matching Profiles and Posts.
 
   <p>
     Results for: <strong>{{ query }}</strong>
-    • <a href="{% url 'search' profile.pk %}">New search</a>
-    • <a href="{% url 'show_profile' profile.pk %}">Back to profile</a>
+    • <a href="{% url 'search' %}">New search</a>
+    • <a href="{% url 'my_profile' %}">Back to profile</a>
   </p>
 
   <h3>Matching Profiles</h3>

@@ -101,8 +101,9 @@ class UpdateProfileView(MiniInstaLoginRequiredMixin, UpdateView):
     model = Profile
     form_class = UpdateProfileForm
     template_name = "mini_insta/update_profile_form.html"
+    
     def get_object(self, queryset=None):
-        return Profile.objects.filter(user=self.request.user).first()
+        return self.get_my_profile()
 
 class DeletePostView(MiniInstaLoginRequiredMixin, PostOwnerRequiredMixin, DeleteView):
     """Delete an existing Post after confirmation."""

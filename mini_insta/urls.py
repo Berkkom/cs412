@@ -26,8 +26,8 @@ urlpatterns = [
     path("post/<int:pk>/update", UpdatePostView.as_view(), name="update_post"),
     path("create_profile", CreateProfileView.as_view(), name="create_profile"),
     path("profile/<int:pk>/follow", FollowProfileView.as_view(), name="follow_profile"),
-path("profile/<int:pk>/delete_follow", UnfollowProfileView.as_view(), name="delete_follow"),
-path("post/<int:pk>/like", LikePostView.as_view(), name="like_post"),
-path("post/<int:pk>/delete_like", UnlikePostView.as_view(), name="delete_like"),
+    path("profile/<int:pk>/delete_follow", UnfollowProfileView.as_view(), name="delete_follow"),
+    path("post/<int:pk>/like", LikePostView.as_view(), name="like_post"),
+    path("post/<int:pk>/delete_like", UnlikePostView.as_view(), name="delete_like"),
 ]
 
