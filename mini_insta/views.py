@@ -323,6 +323,12 @@ class UnlikePostView(MiniInstaLoginRequiredMixin, TemplateView):
         return redirect("show_post", pk=kwargs["pk"])
 
 # ─── REST API Views ─────────────────────────────────────────
+@api_view(['GET'])
+def api_root(request):
+    return Response({
+        "login": "/berkkom/mini_insta/api/login/",
+        "profiles": "/berkkom/mini_insta/api/profiles/",
+    })
 
 @api_view(['POST'])
 def api_login(request):
