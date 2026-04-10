@@ -11,7 +11,7 @@ including first photo, caption, likes, and comments.
   <h2 class="page-title">Feed for {{ profile.display_name }}</h2>
 
   <p>
-    <a href="{% url 'show_profile' profile.pk %}">Back to profile</a>
+    <a href="{% url 'my_profile' %}">Back to profile</a>
   </p>
 
   {% for post in posts %}

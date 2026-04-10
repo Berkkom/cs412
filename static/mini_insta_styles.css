@@ -281,4 +281,13 @@ body {
   padding-left: 18px;
 }
 
+.inline-form {
+  display: inline;
+  margin: 0;
+}
+
+.inline-form button {
+  font: inherit;
+  cursor: pointer;
+}
 

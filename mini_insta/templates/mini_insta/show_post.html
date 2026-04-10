@@ -7,11 +7,10 @@ Description: Displays a single Post with photos, like count, comments, and updat
 
 {% block content %}
 <div class="post-page">
-  <p>
-    <a href="{% url 'update_post' post.pk %}">Update</a>
-    •
+  {% if request.user.is_authenticated and post.profile.user == request.user %}
+    <a href="{% url 'update_post' post.pk %}">Update</a> •
     <a href="{% url 'delete_post' post.pk %}">Delete</a>
-  </p>
+  {% endif %}
   <h2 class="page-title">Post by @{{ post.profile.username }}</h2>
 
   <p><strong>Timestamp:</strong> {{ post.timestamp }}</p>
