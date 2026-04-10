@@ -29,6 +29,7 @@ urlpatterns = [
     path("profile/<int:pk>/delete_follow", UnfollowProfileView.as_view(), name="delete_follow"),
     path("post/<int:pk>/like", LikePostView.as_view(), name="like_post"),
     path("post/<int:pk>/delete_like", UnlikePostView.as_view(), name="delete_like"),
+    path('api/', api_root, name='api_root'),
     path("api/login/", api_login, name="api_login"),
     path("api/profiles/", api_all_profiles, name="api_profiles"),
     path("api/profiles/<int:pk>/", api_one_profile, name="api_profile_detail"),
