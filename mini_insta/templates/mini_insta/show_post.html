@@ -16,7 +16,13 @@ Description: Displays a single Post with photos, like count, comments, and updat
   <p><strong>Timestamp:</strong> {{ post.timestamp }}</p>
 
   <p><strong>Likes:</strong> {{ post.get_num_likes }}</p>
-
+  {% if can_like %}
+    {% if is_liked %}
+      <a href="{% url 'delete_like' post.pk %}">Unlike</a>
+    {% else %}
+      <a href="{% url 'like_post' post.pk %}">Like</a>
+    {% endif %}
+  {% endif %}
   {% if post.caption %}
     <p><strong>Caption:</strong> {{ post.caption }}</p>
   {% else %}

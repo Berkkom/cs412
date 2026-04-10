@@ -5,12 +5,12 @@
 # post feed, and search.
 
 
-from django.views.generic import ListView, DetailView
-from .models import Profile, Post, Photo
+from django.views.generic import ListView, DetailView, TemplateView
+from .models import Profile, Post, Photo, Follow, Like
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from .forms import *
 from django.urls import reverse
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.db.models import Q
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.http import Http404
@@ -51,10 +51,30 @@ class ProfileListView(ListView):
 
 
 class ProfileDetailView(DetailView):
-    """Display a page showing a single Profile record."""
     model = Profile
     template_name = "mini_insta/show_profile.html"
     context_object_name = "profile"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        if self.request.user.is_authenticated:
+            my_profile = Profile.objects.filter(user=self.request.user).first()
+            context["my_profile"] = my_profile
+
+            # Only show follow button if not viewing your own profile
+            context["can_follow"] = (my_profile is not None and my_profile.pk != self.object.pk)
+
+            # True/False: am I following this profile?
+            if context["can_follow"]:
+                context["is_following"] = Follow.objects.filter(
+                    follower_profile=my_profile,
+                    profile=self.object
+                ).exists()
+            else:
+                context["is_following"] = False
+
+        return context
 
 class CreatePostView(MiniInstaLoginRequiredMixin, CreateView):
     model = Post
@@ -142,7 +162,19 @@ class PostDetailView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["profile"] = self.object.profile
+        context["profile"] = self.object.profile  # post owner
+
+        if self.request.user.is_authenticated:
+            my_profile = Profile.objects.filter(user=self.request.user).first()
+            context["my_profile"] = my_profile
+
+            context["can_like"] = (my_profile is not None and my_profile.pk != self.object.profile.pk)
+
+            if context["can_like"]:
+                context["is_liked"] = Like.objects.filter(post=self.object, profile=my_profile).exists()
+            else:
+                context["is_liked"] = False
+
         return context
 
 class SearchView(MiniInstaLoginRequiredMixin, ListView):
@@ -213,3 +245,70 @@ class CreateProfileView(CreateView):
     def get_success_url(self):
         """After creation, go to the new user's profile page."""
         return self.object.get_absolute_url()
+
+class FollowProfileView(MiniInstaLoginRequiredMixin, TemplateView):
+    """Logged-in user follows another Profile."""
+    def dispatch(self, request, *args, **kwargs):
+        me = self.get_my_profile()
+        other = Profile.objects.get(pk=kwargs["pk"])
+
+        # don't allow self-follow
+        if me.pk != other.pk:
+            Follow.objects.get_or_create(profile=other, follower_profile=me)
+
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_template_names(self):
+        return []  # no template; we redirect
+
+    def get(self, request, *args, **kwargs):
+        return redirect("show_profile", pk=kwargs["pk"])
+
+
+class UnfollowProfileView(MiniInstaLoginRequiredMixin, TemplateView):
+    """Logged-in user unfollows another Profile."""
+    def dispatch(self, request, *args, **kwargs):
+        me = self.get_my_profile()
+        other = Profile.objects.get(pk=kwargs["pk"])
+        Follow.objects.filter(profile=other, follower_profile=me).delete()
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_template_names(self):
+        return []
+
+    def get(self, request, *args, **kwargs):
+        return redirect("show_profile", pk=kwargs["pk"])
+
+
+class LikePostView(MiniInstaLoginRequiredMixin, TemplateView):
+    """Logged-in user likes a Post."""
+    def dispatch(self, request, *args, **kwargs):
+        me = self.get_my_profile()
+        post = Post.objects.get(pk=kwargs["pk"])
+
+        # don't allow liking own post
+        if post.profile_id != me.pk:
+            Like.objects.get_or_create(post=post, profile=me)
+
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_template_names(self):
+        return []
+
+    def get(self, request, *args, **kwargs):
+        return redirect("show_post", pk=kwargs["pk"])
+
+
+class UnlikePostView(MiniInstaLoginRequiredMixin, TemplateView):
+    """Logged-in user unlikes a Post."""
+    def dispatch(self, request, *args, **kwargs):
+        me = self.get_my_profile()
+        post = Post.objects.get(pk=kwargs["pk"])
+        Like.objects.filter(post=post, profile=me).delete()
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_template_names(self):
+        return []
+
+    def get(self, request, *args, **kwargs):
+        return redirect("show_post", pk=kwargs["pk"])

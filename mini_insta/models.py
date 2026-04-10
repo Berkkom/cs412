@@ -53,6 +53,10 @@ class Profile(models.Model):
         following_profiles = Follow.objects.filter(follower_profile=self).values_list("profile", flat=True)
         return Post.objects.filter(profile__in=following_profiles).order_by("-timestamp")
 
+    def is_following(self, other_profile):
+        """Return True if this profile follows other_profile."""
+        return Follow.objects.filter(follower_profile=self, profile=other_profile).exists()
+
 class Post(models.Model):
     """Model representing an Instagram-style post."""
 
@@ -83,6 +87,10 @@ class Post(models.Model):
     def get_num_likes(self):
         """Return the number of likes for this Post."""
         return Like.objects.filter(post=self).count()
+        
+    def is_liked_by(self, profile):
+        """Return True if profile has liked this post."""
+        return Like.objects.filter(post=self, profile=profile).exists()
     
 class Photo(models.Model):
     """Model representing a photo associated with a Post."""
