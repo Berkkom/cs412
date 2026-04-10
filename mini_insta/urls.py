@@ -1,5 +1,5 @@
 # File: urls.py
-# Author: Berk Komurcuoglu (berkkom@bu.edu), 2/24/2026
+# Author: Berk Komurcuoglu (berkkom@bu.edu), 4/10/2026
 # Description: URL routes for mini_insta (profiles, posts, feed, followers/following,
 # search, create/update/delete operations).
 
@@ -29,5 +29,10 @@ urlpatterns = [
     path("profile/<int:pk>/delete_follow", UnfollowProfileView.as_view(), name="delete_follow"),
     path("post/<int:pk>/like", LikePostView.as_view(), name="like_post"),
     path("post/<int:pk>/delete_like", UnlikePostView.as_view(), name="delete_like"),
+    path("api/login/", api_login, name="api_login"),
+    path("api/profiles/", api_all_profiles, name="api_profiles"),
+    path("api/profiles/<int:pk>/", api_one_profile, name="api_profile_detail"),
+    path("api/profiles/<int:pk>/posts/", api_profile_posts, name="api_profile_posts"),
+    path("api/profiles/<int:pk>/feed/", api_profile_feed, name="api_profile_feed"),
+    path("api/profiles/<int:pk>/posts/create/", api_create_post, name="api_create_post"),
 ]
-

@@ -1,8 +1,8 @@
 # File: views.py
-# Author: Berk Komurcuoglu (berkkom@bu.edu), 2/24/2026
+# Author: Berk Komurcuoglu (berkkom@bu.edu), 4/10/2026
 # Description: Class-based views for mini_insta, including profile/post display,
 # creating/updating/deleting posts, updating profiles, follower/following pages,
-# post feed, and search.
+# post feed, search, and REST API endpoints with token authentication.
 
 
 from django.views.generic import ListView, DetailView, TemplateView
@@ -10,12 +10,20 @@ from .models import Profile, Post, Photo, Follow, Like
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from .forms import *
 from django.urls import reverse
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.db.models import Q
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.http import Http404
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import login
+from rest_framework.decorators import api_view, authentication_classes, permission_classes
+from rest_framework.authentication import TokenAuthentication
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework import status
+from rest_framework.authtoken.models import Token
+from django.contrib.auth import authenticate
+from .serializers import ProfileSerializer, PostSerializer
 
 class MiniInstaLoginRequiredMixin(LoginRequiredMixin):
     def get_login_url(self):
@@ -313,3 +321,74 @@ class UnlikePostView(MiniInstaLoginRequiredMixin, TemplateView):
 
     def get(self, request, *args, **kwargs):
         return redirect("show_post", pk=kwargs["pk"])
+
+# ─── REST API Views ─────────────────────────────────────────
+
+@api_view(['POST'])
+def api_login(request):
+    """Authenticate user and return token + profile id."""
+    username = request.data.get('username')
+    password = request.data.get('password')
+    user = authenticate(username=username, password=password)
+    if user is not None:
+        token, _ = Token.objects.get_or_create(user=user)
+        profile = Profile.objects.filter(user=user).first()
+        return Response({
+            'token': token.key,
+            'profile_id': profile.pk if profile else None,
+            'username': user.username,
+        })
+    return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
+
+@api_view(['GET'])
+def api_all_profiles(request):
+    """Return all Profiles as JSON."""
+    profiles = Profile.objects.all()
+    serializer = ProfileSerializer(profiles, many=True, context={"request": request})
+    return Response(serializer.data)
+
+@api_view(['GET'])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def api_one_profile(request, pk):
+    """Return one Profile by primary key as JSON."""
+    profile = get_object_or_404(Profile, pk=pk)
+    serializer = ProfileSerializer(profile, context={"request": request})
+    return Response(serializer.data)
+
+@api_view(['GET'])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def api_profile_posts(request, pk):
+    """Return all Posts (with photos) for one Profile as JSON."""
+    profile = get_object_or_404(Profile, pk=pk)
+    posts = profile.get_all_posts()
+    serializer = PostSerializer(posts, many=True, context={"request": request})
+    return Response(serializer.data)
+
+@api_view(['GET'])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def api_profile_feed(request, pk):
+    """Return the feed for one Profile (posts by followed users) as JSON."""
+    profile = get_object_or_404(Profile, pk=pk)
+    posts = profile.get_post_feed()
+    serializer = PostSerializer(posts, many=True, context={"request": request})
+    return Response(serializer.data)
+
+@api_view(['GET', 'POST'])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def api_create_post(request, pk):
+    """GET: return posts for profile. POST: create a new Post for the given Profile."""
+    profile = get_object_or_404(Profile, pk=pk)
+    if request.method == 'GET':
+        posts = profile.get_all_posts()
+        serializer = PostSerializer(posts, many=True, context={"request": request})
+        return Response(serializer.data)
+    elif request.method == 'POST':
+        serializer = PostSerializer(data=request.data, context={"request": request})
+        if serializer.is_valid():
+            serializer.save(profile=profile)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
