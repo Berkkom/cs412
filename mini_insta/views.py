@@ -8,12 +8,14 @@
 from django.views.generic import ListView, DetailView
 from .models import Profile, Post, Photo
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
-from .forms import CreatePostForm, UpdateProfileForm
+from .forms import *
 from django.urls import reverse
 from django.shortcuts import render
 from django.db.models import Q
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.http import Http404
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth import login
 
 class MiniInstaLoginRequiredMixin(LoginRequiredMixin):
     def get_login_url(self):
@@ -99,7 +101,7 @@ class DeletePostView(MiniInstaLoginRequiredMixin, PostOwnerRequiredMixin, Delete
         return self.object.profile.get_absolute_url()
 
 
-class UpdatePostView(LoginRequiredMixin, PostOwnerRequiredMixin, UpdateView):
+class UpdatePostView(MiniInstaLoginRequiredMixin, PostOwnerRequiredMixin, UpdateView):
     model = Post
     fields = ["caption"]
     template_name = "mini_insta/update_post_form.html"
@@ -178,3 +180,36 @@ class SearchView(MiniInstaLoginRequiredMixin, ListView):
         context["posts"] = self.get_queryset()
         context["profiles"] = matching_profiles
         return context
+
+class CreateProfileView(CreateView):
+    """Create a new Django User and a new Profile in one submission."""
+    model = Profile
+    form_class = CreateProfileForm
+    template_name = "mini_insta/create_profile_form.html"
+
+    def get_context_data(self, **kwargs):
+        """Add a UserCreationForm to the context so the template can show both forms."""
+        context = super().get_context_data(**kwargs)
+        context["user_form"] = context.get("user_form", UserCreationForm())
+        return context
+
+    def form_valid(self, form):
+        """
+        Create the User first, log them in, attach the user to the Profile,
+        then save the Profile via the normal CreateView flow.
+        """
+        user_form = UserCreationForm(self.request.POST)
+
+        if not user_form.is_valid():
+            # Re-render the page showing both forms + user_form errors
+            return self.render_to_response(self.get_context_data(form=form, user_form=user_form))
+
+        user = user_form.save()
+        login(self.request, user, backend="django.contrib.auth.backends.ModelBackend")
+
+        form.instance.user = user
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        """After creation, go to the new user's profile page."""
+        return self.object.get_absolute_url()
