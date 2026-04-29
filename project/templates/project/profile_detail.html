@@ -78,8 +78,26 @@
     <p style="margin-top: 8px;">{{ rating.review_text }}</p>
     {% endif %}
     <div style="display: flex; align-items: center; gap: 16px; margin-top: 8px;">
+        {% if user.is_authenticated %}
+        <form method="POST" action="{% url 'project:toggle_like' rating.pk %}" style="display: inline;">
+            {% csrf_token %}
+            <input type="hidden" name="next" value="{% url 'project:profile_detail' profile.pk %}">
+            <button type="submit" style="background: none; border: none; cursor: pointer; font-size: 16px; padding: 0; display: flex; align-items: center; gap: 4px;">
+                {% if user in rating.likes.all %}
+                <span style="color: #e24b4a;">❤️</span>
+                {% else %}
+                <span style="color: #888;">🤍</span>
+                {% endif %}
+                <span class="meta">{{ rating.get_like_count }}</span>
+            </button>
+        </form>
+        {% else %}
         <span class="meta">{{ rating.get_like_count }} like{{ rating.get_like_count|pluralize }}</span>
-        <a href="{% url 'project:rating_detail' rating.pk %}" class="meta">{{ rating.comments.count }} comment{{ rating.comments.count|pluralize }}</a>
+        {% endif %}
+        <a href="{% url 'project:rating_detail' rating.pk %}" style="display: flex; align-items: center; gap: 4px; text-decoration: none;">
+            <span style="color: #888; font-size: 16px;">💬</span>
+            <span class="meta">{{ rating.comments.count }}</span>
+        </a>
         <span class="meta">{{ rating.created_at|timesince }} ago</span>
     </div>
 </div>
