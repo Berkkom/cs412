@@ -1,0 +1,151 @@
+<!-- File: song_detail.html -->
+<!-- Author: Berk Komurcuoglu (berkkom@bu.edu), 4/28/2026 -->
+<!-- Description: Song detail page with rating form and all reviews. -->
+
+{% extends 'project/base.html' %}
+
+{% block title %}{{ song.title }} - Music Rater{% endblock %}
+
+{% block content %}
+<!-- Song Header -->
+<div style="text-align: center; margin-bottom: 32px;">
+    <img src="https://coverartarchive.org/release-group/{{ song.album.musicbrainz_id }}/front-250"
+         alt="{{ song.album.title }}"
+         onerror="this.style.display='none'"
+         style="width: 200px; height: 200px; border-radius: 8px; object-fit: cover; margin-bottom: 16px;">
+    <h1 style="margin-bottom: 4px;">{{ song.title }}</h1>
+    <p class="meta" style="font-size: 16px;">
+        Song · <a href="{{ song.album.artist.get_absolute_url }}">{{ song.album.artist.name }}</a>
+    </p>
+
+    {% with avg=song.get_average_rating count=song.get_rating_count %}
+    {% if avg %}
+    <p style="margin-top: 8px;">
+        <span class="score" style="font-size: 22px;">{{ avg }}</span>
+        <span class="meta">({{ count }} review{{ count|pluralize }})</span>
+    </p>
+    {% endif %}
+    {% endwith %}
+</div>
+
+<!-- Overview -->
+<div class="card" style="margin-bottom: 24px;">
+    <h3 style="margin-bottom: 12px;">Overview</h3>
+    <p class="meta">
+        <strong>Album:</strong>
+        <a href="{{ song.album.get_absolute_url }}">{{ song.album.title }}</a>
+    </p>
+    <p class="meta" style="margin-top: 4px;">
+        <strong>Track:</strong> {{ song.track_number }}
+    </p>
+    {% if song.album.release_date %}
+    <p class="meta" style="margin-top: 4px;">
+        <strong>Released:</strong> {{ song.album.release_date|date:"F j, Y" }}
+    </p>
+    {% endif %}
+</div>
+
+<!-- Rating Form -->
+{% if user.is_authenticated %}
+<div class="card" style="margin-bottom: 24px; padding: 20px;">
+    {% if user_rating %}
+    <h3 style="margin-bottom: 12px;">Your Rating</h3>
+    <form method="POST" action="{% url 'project:rate_song' song.pk %}">
+        {% csrf_token %}
+        <div style="display: flex; gap: 12px; align-items: flex-start;">
+            <div>
+                <label class="meta" style="display: block; margin-bottom: 4px;">Score (1-10)</label>
+                <input type="number" name="score" value="{{ user_rating.score }}" min="1" max="10" step="0.1" required
+                       style="width: 80px; padding: 10px; background: #2a2a2a; border: 1px solid #3a3a3a; border-radius: 6px; color: #1db954; font-size: 18px; font-weight: 700; text-align: center;">
+            </div>
+            <div style="flex: 1;">
+                <label class="meta" style="display: block; margin-bottom: 4px;">Review (optional)</label>
+                <textarea name="review_text" rows="2" placeholder="What do you think of this song?"
+                          style="width: 100%; padding: 10px; background: #2a2a2a; border: 1px solid #3a3a3a; border-radius: 6px; color: #e0e0e0; font-size: 14px; resize: vertical; font-family: inherit;">{{ user_rating.review_text }}</textarea>
+            </div>
+        </div>
+        <div style="display: flex; gap: 8px; margin-top: 12px;">
+            <button type="submit"
+                    style="padding: 10px 24px; background: #1db954; color: #000; border: none; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer;">
+                Update Rating
+            </button>
+        </div>
+    </form>
+    <form method="POST" action="{% url 'project:delete_rating' user_rating.pk %}" style="margin-top: 8px;">
+        {% csrf_token %}
+        <button type="submit"
+                style="padding: 8px 16px; background: transparent; border: 1px solid #e24b4a; color: #e24b4a; border-radius: 6px; font-size: 13px; cursor: pointer;"
+                onclick="return confirm('Are you sure you want to delete your rating?')">
+            Delete Rating
+        </button>
+    </form>
+    {% else %}
+    <h3 style="margin-bottom: 12px;">Rate This Song</h3>
+    <form method="POST" action="{% url 'project:rate_song' song.pk %}">
+        {% csrf_token %}
+        <div style="display: flex; gap: 12px; align-items: flex-start;">
+            <div>
+                <label class="meta" style="display: block; margin-bottom: 4px;">Score (1-10)</label>
+                <input type="number" name="score" min="1" max="10" step="0.1" required placeholder="0.0"
+                       style="width: 80px; padding: 10px; background: #2a2a2a; border: 1px solid #3a3a3a; border-radius: 6px; color: #1db954; font-size: 18px; font-weight: 700; text-align: center;">
+            </div>
+            <div style="flex: 1;">
+                <label class="meta" style="display: block; margin-bottom: 4px;">Review (optional)</label>
+                <textarea name="review_text" rows="2" placeholder="What do you think of this song?"
+                          style="width: 100%; padding: 10px; background: #2a2a2a; border: 1px solid #3a3a3a; border-radius: 6px; color: #e0e0e0; font-size: 14px; resize: vertical; font-family: inherit;"></textarea>
+            </div>
+        </div>
+        <button type="submit" style="margin-top: 12px; padding: 10px 24px; background: #1db954; color: #000; border: none; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer;">
+            Submit Rating
+        </button>
+    </form>
+    {% endif %}
+</div>
+{% else %}
+<div class="card" style="margin-bottom: 24px; text-align: center; padding: 20px;">
+    <p><a href="{% url 'project:login' %}">Log in</a> to rate this song.</p>
+</div>
+{% endif %}
+
+<!-- All Ratings -->
+<h2>Reviews</h2>
+{% for rating in song.ratings.all %}
+<div class="card">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+        <div>
+            <a href="{% url 'project:profile_detail' rating.user.music_profile.pk %}">
+                <strong>@{{ rating.user.username }}</strong>
+            </a>
+            <span class="meta">· {{ rating.created_at|timesince }} ago</span>
+        </div>
+        <span class="score">{{ rating.score }}</span>
+    </div>
+    {% if rating.review_text %}
+    <p style="margin-top: 8px;">{{ rating.review_text }}</p>
+    {% endif %}
+    <div class="meta" style="margin-top: 8px;">
+        {{ rating.get_like_count }} like{{ rating.get_like_count|pluralize }}
+        · {{ rating.comments.count }} comment{{ rating.comments.count|pluralize }}
+        · <a href="{{ rating.get_absolute_url }}">View</a>
+    </div>
+    <div style="display: flex; align-items: center; gap: 16px; margin-top: 8px;">
+        {% if user.is_authenticated %}
+        <form method="POST" action="{% url 'project:toggle_like' rating.pk %}" style="display: inline;">
+            {% csrf_token %}
+            <input type="hidden" name="next" value="{% url 'project:song_detail' song.pk %}">
+            <button type="submit" style="background: none; border: none; cursor: pointer; font-size: 16px; padding: 0; display: flex; align-items: center; gap: 4px;">
+                {% if user in rating.likes.all %}
+                <span style="color: #e24b4a;">❤️</span>
+                {% else %}
+                <span style="color: #888;">🤍</span>
+                {% endif %}
+            </button>
+        </form>
+        {% endif %}
+        <a href="{% url 'project:rating_detail' rating.pk %}" style="color: #888; font-size: 16px; text-decoration: none;">💬</a>
+    </div>
+</div>
+{% empty %}
+<p>No reviews yet. Be the first to rate this song!</p>
+{% endfor %}
+{% endblock %}

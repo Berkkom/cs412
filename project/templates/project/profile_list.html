@@ -1,0 +1,49 @@
+<!-- File: profile_list.html -->
+<!-- Author: Berk Komurcuoglu (berkkom@bu.edu), 4/28/2026 -->
+<!-- Description: Searchable list of user profiles. -->
+
+{% extends 'project/base.html' %}
+
+{% block title %}Profiles - Music Rater{% endblock %}
+
+{% block content %}
+<h1>Profiles</h1>
+
+<form method="GET" action="{% url 'project:profile_list' %}" style="margin-bottom: 24px;">
+    <div style="display: flex; gap: 8px;">
+        <input type="text" name="q" value="{{ query }}" placeholder="Search users..."
+               style="flex: 1; padding: 12px 16px; background: #2a2a2a; border: 1px solid #3a3a3a; border-radius: 8px; color: #e0e0e0; font-size: 16px;">
+        <button type="submit"
+                style="padding: 12px 24px; background: #1db954; color: #000; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer;">
+            Search
+        </button>
+    </div>
+</form>
+
+{% for profile in profiles %}
+<a href="{{ profile.get_absolute_url }}" style="text-decoration: none; color: inherit;">
+    <div class="card" style="display: flex; align-items: center; gap: 16px;">
+        <div style="width: 50px; height: 50px; border-radius: 50%; background: #2a2a2a; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 20px; color: #888;">
+            {{ profile.display_name|first|upper }}
+        </div>
+        <div style="flex: 1;">
+            <strong>{{ profile.display_name }}</strong>
+            <p class="meta">
+                @{{ profile.user.username }}
+                · {{ profile.get_rating_count }} rating{{ profile.get_rating_count|pluralize }}
+                · {{ profile.get_follower_count }} follower{{ profile.get_follower_count|pluralize }}
+            </p>
+        </div>
+        {% if profile.country %}
+        <span class="tag">{{ profile.country }}</span>
+        {% endif %}
+    </div>
+</a>
+{% empty %}
+{% if query %}
+<p>No users found matching "{{ query }}".</p>
+{% else %}
+<p>No profiles yet.</p>
+{% endif %}
+{% endfor %}
+{% endblock %}

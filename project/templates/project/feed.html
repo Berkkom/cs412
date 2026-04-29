@@ -1,0 +1,88 @@
+<!-- File: feed.html -->
+<!-- Author: Berk Komurcuoglu (berkkom@bu.edu), 4/28/2026 -->
+<!-- Description: Activity feed showing recent ratings from followed users. -->
+
+{% extends 'project/base.html' %}
+
+{% block title %}Feed - Music Rater{% endblock %}
+
+{% block content %}
+<h1>Feed</h1>
+
+{% for rating in ratings %}
+<div class="card" style="padding: 20px;">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+        <div>
+            <a href="{% url 'project:profile_detail' rating.user.music_profile.pk %}">
+                <strong>@{{ rating.user.username }}</strong>
+            </a>
+            <span class="meta">· {{ rating.created_at|timesince }} ago</span>
+        </div>
+        <span class="score" style="font-size: 22px;">{{ rating.score }}</span>
+    </div>
+
+    <a href="{{ rating.song.get_absolute_url }}" style="text-decoration: none; color: inherit;">
+        <div style="display: flex; align-items: center; gap: 12px; margin-top: 12px; padding: 12px; background: #222; border-radius: 8px;">
+            <img src="https://coverartarchive.org/release-group/{{ rating.song.album.musicbrainz_id }}/front-250"
+                 alt="{{ rating.song.album.title }}"
+                 onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2245%22 height=%2245%22><rect fill=%22%232a2a2a%22 width=%2245%22 height=%2245%22/><text x=%2222%22 y=%2228%22 fill=%22%23555%22 text-anchor=%22middle%22 font-size=%2218%22>♪</text></svg>'"
+                 style="width: 45px; height: 45px; border-radius: 4px; object-fit: cover;">
+            <div>
+                <strong>{{ rating.song.title }}</strong>
+                <p class="meta">{{ rating.song.album.artist.name }} · {{ rating.song.album.title }}</p>
+            </div>
+        </div>
+    </a>
+
+    {% if rating.review_text %}
+    <p style="margin-top: 10px;">{{ rating.review_text }}</p>
+    {% endif %}
+
+    <div style="display: flex; align-items: center; gap: 16px; margin-top: 12px;">
+        <!-- Like button -->
+        <form method="POST" action="{% url 'project:toggle_like' rating.pk %}" style="display: inline;">
+            {% csrf_token %}
+            <input type="hidden" name="next" value="{% url 'project:feed' %}">
+            <button type="submit" style="background: none; border: none; cursor: pointer; font-size: 16px; padding: 0; display: flex; align-items: center; gap: 4px;">
+                {% if user in rating.likes.all %}
+                <span style="color: #e24b4a;">❤️</span>
+                {% else %}
+                <span style="color: #888;">🤍</span>
+                {% endif %}
+                <span class="meta">{{ rating.get_like_count }}</span>
+            </button>
+        </form>
+
+        <!-- Comment link -->
+        <a href="{% url 'project:rating_detail' rating.pk %}" style="display: flex; align-items: center; gap: 4px; text-decoration: none;">
+            <span style="color: #888; font-size: 16px;">💬</span>
+            <span class="meta">{{ rating.comments.count }}</span>
+        </a>
+    </div>
+</div>
+{% empty %}
+<div class="card" style="text-align: center; padding: 32px;">
+    <p style="font-size: 16px; margin-bottom: 8px;">Your feed is empty</p>
+    <p class="meta">Follow other users from the <a href="{% url 'project:profile_list' %}">Profiles</a> page to see their ratings here.</p>
+</div>
+{% endfor %}
+
+<!-- Pagination -->
+{% if ratings.has_other_pages %}
+<div style="display: flex; justify-content: center; align-items: center; gap: 16px; margin-top: 24px;">
+    {% if ratings.has_previous %}
+    <a href="?page={{ ratings.previous_page_number }}"
+       style="padding: 8px 16px; background: #2a2a2a; border-radius: 6px; color: #e0e0e0; text-decoration: none;">
+        Previous
+    </a>
+    {% endif %}
+    <span class="meta">Page {{ ratings.number }} of {{ ratings.paginator.num_pages }}</span>
+    {% if ratings.has_next %}
+    <a href="?page={{ ratings.next_page_number }}"
+       style="padding: 8px 16px; background: #2a2a2a; border-radius: 6px; color: #e0e0e0; text-decoration: none;">
+        Next
+    </a>
+    {% endif %}
+</div>
+{% endif %}
+{% endblock %}

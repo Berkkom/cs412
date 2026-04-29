@@ -27,6 +27,7 @@ urlpatterns = [
     path("voters/", include("voter_analytics.urls")),
     path("marathon_analytics/", include("marathon_analytics.urls")),
     path('dadjokes/', include("dadjokes.urls")),
+    path('project/', include("project.urls")),
 ]
 
 if settings.DEBUG:

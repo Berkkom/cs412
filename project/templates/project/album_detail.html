@@ -1,0 +1,186 @@
+<!-- File: album_detail.html -->
+<!-- Author: Berk Komurcuoglu (berkkom@bu.edu), 4/28/2026 -->
+<!-- Description: Album detail page showing stats, tracklist, and all reviews. -->
+
+{% extends 'project/base.html' %}
+
+{% block title %}{{ album.title }} - Music Rater{% endblock %}
+
+{% block content %}
+<!-- Album Header -->
+<div style="display: flex; align-items: center; gap: 24px; margin-bottom: 32px;">
+    <img src="https://coverartarchive.org/release-group/{{ album.musicbrainz_id }}/front-250"
+         alt="{{ album.title }}"
+         onerror="this.style.display='none'"
+         style="width: 120px; height: 120px; border-radius: 8px; object-fit: cover;">
+    <div>
+        <p class="meta" style="margin-bottom: 4px;">
+            <a href="{{ album.artist.get_absolute_url }}">{{ album.artist.name }}</a>
+        </p>
+        <h1 style="margin-bottom: 4px;">{{ album.title }}</h1>
+        {% if album.release_date %}
+        <p class="meta">Released: {{ album.release_date|date:"F j, Y" }}</p>
+        {% endif %}
+        <div style="display: flex; gap: 24px; margin-top: 8px;">
+            {% if avg_rating %}
+            <div>
+                <span class="score" style="font-size: 24px;">{{ avg_rating }}</span>
+                <span class="meta"> avg rating</span>
+            </div>
+            {% endif %}
+            <div>
+                <span style="font-weight: 700; font-size: 18px;">{{ total_ratings }}</span>
+                <span class="meta"> review{{ total_ratings|pluralize }}</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Songs -->
+<h2>Songs</h2>
+{% for song in album.songs.all %}
+<a href="{{ song.get_absolute_url }}" style="text-decoration: none; color: inherit;">
+    <div class="card" style="display: flex; align-items: center; gap: 16px;">
+        <span class="meta" style="width: 24px; text-align: right; flex-shrink: 0;">{{ song.track_number }}</span>
+        <div style="flex: 1;">
+            <strong>{{ song.title }}</strong>
+        </div>
+        {% with avg=song.get_average_rating count=song.get_rating_count %}
+        {% if avg %}
+        <span class="meta">{{ count }} review{{ count|pluralize }}</span>
+        <span class="score">{{ avg }}</span>
+        {% endif %}
+        {% endwith %}
+    </div>
+</a>
+{% empty %}
+<p>No songs found for this album.</p>
+{% endfor %}
+
+<!-- World Ratings Map -->
+{% if ratings %}
+<h2 style="margin-top: 32px;">Ratings Around the World</h2>
+<div id="world-map" style="height: 400px; border-radius: 8px; margin-bottom: 32px; background: #1a1a1a;"></div>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/topojson/3.0.2/topojson.min.js"></script>
+<script>
+(function() {
+    const countryRatings = {{ country_data_json|safe }};
+
+    // Build a lookup by country name
+    const ratingsByCountry = {};
+    countryRatings.forEach(r => {
+        ratingsByCountry[r.country] = r;
+    });
+
+    // Country ID to name mapping (ISO 3166-1 numeric to name)
+    const countryNames = {
+        "840": "United States", "826": "United Kingdom", "792": "Turkey",
+        "250": "France", "276": "Germany", "380": "Italy", "724": "Spain",
+        "076": "Brazil", "124": "Canada", "036": "Australia", "392": "Japan",
+        "156": "China", "356": "India", "643": "Russia", "410": "South Korea",
+        "484": "Mexico", "032": "Argentina", "710": "South Africa",
+        "528": "Netherlands", "056": "Belgium", "756": "Switzerland",
+        "040": "Austria", "616": "Poland", "752": "Sweden", "578": "Norway",
+        "208": "Denmark", "246": "Finland", "372": "Ireland", "620": "Portugal",
+        "300": "Greece", "203": "Czech Republic", "348": "Hungary",
+        "642": "Romania", "100": "Bulgaria", "191": "Croatia",
+        "804": "Ukraine", "818": "Egypt", "682": "Saudi Arabia",
+        "784": "United Arab Emirates", "376": "Israel", "170": "Colombia",
+        "152": "Chile", "604": "Peru", "862": "Venezuela",
+        "360": "Indonesia", "764": "Thailand", "704": "Vietnam",
+        "608": "Philippines", "458": "Malaysia", "702": "Singapore",
+        "554": "New Zealand", "566": "Nigeria", "404": "Kenya",
+        "586": "Pakistan", "050": "Bangladesh", "144": "Sri Lanka",
+    };
+
+    const map = L.map('world-map', { scrollWheelZoom: false }).setView([20, 0], 2);
+
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+        attribution: '&copy; OpenStreetMap &copy; CARTO',
+        maxZoom: 18,
+    }).addTo(map);
+
+    function getColor(avg) {
+        // Darker green = higher rating
+        if (avg >= 9.5) return '#004d1a';
+        if (avg >= 9.0) return '#006622';
+        if (avg >= 8.5) return '#00802b';
+        if (avg >= 8.0) return '#009933';
+        if (avg >= 7.0) return '#1db954';
+        if (avg >= 6.0) return '#4cdf7c';
+        if (avg >= 5.0) return '#8cf0aa';
+        return '#c6f7d5';
+    }
+
+    fetch('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json')
+        .then(r => r.json())
+        .then(topoData => {
+            const geojson = topojson.feature(topoData, topoData.objects.countries);
+
+            L.geoJSON(geojson, {
+                style: function(feature) {
+                    const id = feature.id;
+                    const name = countryNames[id] || '';
+                    const rating = ratingsByCountry[name];
+                    if (rating) {
+                        return {
+                            fillColor: getColor(rating.avg),
+                            weight: 1, opacity: 0.7,
+                            color: '#444', fillOpacity: 0.75,
+                        };
+                    }
+                    return {
+                        fillColor: '#2a2a2a',
+                        weight: 0.5, opacity: 0.3,
+                        color: '#333', fillOpacity: 0.3,
+                    };
+                },
+                onEachFeature: function(feature, layer) {
+                    const id = feature.id;
+                    const name = countryNames[id] || '';
+                    const rating = ratingsByCountry[name];
+                    if (rating) {
+                        layer.bindPopup(
+                            '<strong>' + name + '</strong><br>' +
+                            'Avg: <span style="color:' + getColor(rating.avg) + ';font-weight:700">' + rating.avg + '</span><br>' +
+                            rating.count + ' review' + (rating.count !== 1 ? 's' : '')
+                        );
+                    }
+                }
+            }).addTo(map);
+        });
+})();
+</script>
+{% endif %}
+
+<!-- Reviews -->
+<h2 style="margin-top: 32px;">Reviews</h2>
+{% for rating in ratings %}
+<div class="card">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+        <div>
+            <a href="{% url 'project:profile_detail' rating.user.music_profile.pk %}">
+                <strong>@{{ rating.user.username }}</strong>
+            </a>
+            <span class="meta">· {{ rating.created_at|timesince }} ago</span>
+        </div>
+        <span class="score">{{ rating.score }}</span>
+    </div>
+    <p style="margin-top: 6px;">
+        <a href="{{ rating.song.get_absolute_url }}" style="color: #aaa;">{{ rating.song.title }}</a>
+    </p>
+    {% if rating.review_text %}
+    <p style="margin-top: 8px;">{{ rating.review_text }}</p>
+    {% endif %}
+    <div class="meta" style="margin-top: 8px;">
+        {{ rating.get_like_count }} like{{ rating.get_like_count|pluralize }}
+        · {{ rating.comments.count }} comment{{ rating.comments.count|pluralize }}
+    </div>
+</div>
+{% empty %}
+<p>No reviews yet for this album.</p>
+{% endfor %}
+{% endblock %}

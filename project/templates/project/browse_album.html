@@ -1,0 +1,74 @@
+<!-- File: browse_album.html -->
+<!-- Author: Berk Komurcuoglu (berkkom@bu.edu), 4/28/2026 -->
+<!-- Description: Step 3 - Browse tracks for a specific album from MusicBrainz. -->
+
+{% extends 'project/base.html' %}
+
+{% block title %}{{ album_title }} - Music Rater{% endblock %}
+
+{% block content %}
+<p class="meta" style="margin-bottom: 8px;">
+    <a href="{% url 'project:browse_artist' artist_mbid %}">← Back to {{ artist_name }}</a>
+</p>
+
+<div style="display: flex; align-items: center; gap: 20px; margin-bottom: 24px;">
+    <img src="https://coverartarchive.org/release-group/{{ release_group_mbid }}/front-250"
+         alt="{{ album_title }}"
+         onerror="this.style.display='none'"
+         style="width: 120px; height: 120px; border-radius: 8px; object-fit: cover;">
+    <div>
+        <h1 style="margin-bottom: 4px;">{{ album_title }}</h1>
+        <p class="meta">{{ artist_name }}{% if release_date %} · {{ release_date }}{% endif %}</p>
+        {% if local_album %}
+        <div style="display: flex; align-items: center; gap: 16px; margin-top: 8px;">
+            {% if local_album.avg_rating %}
+            <span class="score" style="font-size: 20px;">{{ local_album.avg_rating|floatformat:1 }}</span>
+            <span class="meta">{{ local_album.rating_count }} review{{ local_album.rating_count|pluralize }}</span>
+            {% endif %}
+            <a href="{{ local_album.get_absolute_url }}" style="padding: 6px 16px; background: #2a2a2a; border-radius: 20px; font-size: 13px;">
+                See Reviews
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<h2>Tracks</h2>
+{% for track in tracks %}
+<div class="card" style="display: flex; align-items: center; gap: 16px;">
+    <span class="meta" style="width: 24px; text-align: right; flex-shrink: 0;">{{ track.track_number }}</span>
+    <div style="flex: 1;">
+        <strong>{{ track.title }}</strong>
+        {% if track.duration %}
+        <span class="meta" style="margin-left: 8px;">
+            {{ track.duration|floatformat:0 }}ms
+        </span>
+        {% endif %}
+    </div>
+    {% if track.avg_rating %}
+    <div style="text-align: right; margin-right: 8px;">
+        <span class="score">{{ track.avg_rating }}</span>
+        <p class="meta">{{ track.rating_count }} review{{ track.rating_count|pluralize }}</p>
+    </div>
+    {% endif %}
+    <form method="POST" action="{% url 'project:import_song' %}">
+        {% csrf_token %}
+        <input type="hidden" name="song_title" value="{{ track.title }}">
+        <input type="hidden" name="song_id" value="{{ track.recording_id }}">
+        <input type="hidden" name="artist_name" value="{{ artist_name }}">
+        <input type="hidden" name="artist_id" value="{{ artist_mbid }}">
+        <input type="hidden" name="album_title" value="{{ album_title }}">
+        <input type="hidden" name="release_group_id" value="{{ release_group_mbid }}">
+        <input type="hidden" name="release_date" value="{{ release_date }}">
+        <input type="hidden" name="duration" value="{{ track.duration }}">
+        <input type="hidden" name="track_number" value="{{ track.track_number }}">
+        <button type="submit"
+                style="padding: 8px 20px; background: transparent; border: 1px solid #1db954; color: #1db954; border-radius: 20px; font-size: 14px; cursor: pointer;">
+            + Rate
+        </button>
+    </form>
+</div>
+{% empty %}
+<p>No tracks found for this album.</p>
+{% endfor %}
+{% endblock %}

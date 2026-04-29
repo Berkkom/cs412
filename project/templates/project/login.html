@@ -1,0 +1,41 @@
+<!-- File: login.html -->
+<!-- Author: Berk Komurcuoglu (berkkom@bu.edu), 4/19/2026 -->
+<!-- Description: Login page for the music rating application. -->
+
+{% extends 'project/base.html' %}
+
+{% block title %}Login - Music Rater{% endblock %}
+
+{% block content %}
+<div style="max-width: 400px; margin: 60px auto;">
+    <h1 style="text-align: center;">Login</h1>
+    <p class="meta" style="text-align: center; margin-bottom: 24px;">Welcome back to Music Rater</p>
+
+    {% if form.errors %}
+    <div style="background: #3a1a1a; border: 1px solid #e24b4a; border-radius: 8px; padding: 12px; margin-bottom: 16px; color: #f09595; font-size: 14px;">
+        Invalid username or password. Please try again.
+    </div>
+    {% endif %}
+
+    <form method="POST" action="{% url 'project:login' %}">
+        {% csrf_token %}
+        <div style="margin-bottom: 16px;">
+            <label style="display: block; font-size: 14px; color: #aaa; margin-bottom: 6px;">Username</label>
+            <input type="text" name="username" required autofocus
+                   style="width: 100%; padding: 10px 14px; background: #2a2a2a; border: 1px solid #3a3a3a; border-radius: 6px; color: #e0e0e0; font-size: 16px;">
+        </div>
+        <div style="margin-bottom: 24px;">
+            <label style="display: block; font-size: 14px; color: #aaa; margin-bottom: 6px;">Password</label>
+            <input type="password" name="password" required
+                   style="width: 100%; padding: 10px 14px; background: #2a2a2a; border: 1px solid #3a3a3a; border-radius: 6px; color: #e0e0e0; font-size: 16px;">
+        </div>
+        <button type="submit"
+                style="width: 100%; padding: 12px; background: #1db954; color: #000; border: none; border-radius: 6px; font-size: 16px; font-weight: 600; cursor: pointer;">
+            Login
+        </button>
+    </form>
+    <p style="text-align: center; margin-top: 16px; font-size: 14px; color: #888;">
+        Don't have an account? <a href="{% url 'project:register' %}">Sign up</a>
+    </p>
+</div>
+{% endblock %}

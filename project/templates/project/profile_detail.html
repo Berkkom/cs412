@@ -1,0 +1,89 @@
+<!-- File: profile_detail.html -->
+<!-- Author: Berk Komurcuoglu (berkkom@bu.edu), 4/28/2026 -->
+<!-- Description: User profile with follow button, stats, and ratings. -->
+
+{% extends 'project/base.html' %}
+
+{% block title %}{{ profile.display_name }} - Music Rater{% endblock %}
+
+{% block content %}
+<div style="text-align: center; margin-bottom: 32px;">
+    <div style="width: 80px; height: 80px; border-radius: 50%; background: #2a2a2a; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px; font-size: 32px; color: #888;">
+        {{ profile.display_name|first|upper }}
+    </div>
+    <h1>{{ profile.display_name }}</h1>
+    <p class="meta">@{{ profile.user.username }}</p>
+    {% if profile.bio %}
+    <p style="margin-top: 8px; max-width: 500px; margin-left: auto; margin-right: auto;">{{ profile.bio }}</p>
+    {% endif %}
+    {% if profile.country %}
+    <span class="tag" style="margin-top: 12px;">{{ profile.country }}</span>
+    {% endif %}
+
+    <div style="display: flex; justify-content: center; gap: 32px; margin-top: 20px;">
+        <div>
+            <div style="font-size: 20px; font-weight: 700;">{{ profile.get_rating_count }}</div>
+            <div class="meta">ratings</div>
+        </div>
+        <div>
+            <div style="font-size: 20px; font-weight: 700;">{{ profile.get_follower_count }}</div>
+            <div class="meta">followers</div>
+        </div>
+        <div>
+            <div style="font-size: 20px; font-weight: 700;">{{ profile.get_following_count }}</div>
+            <div class="meta">following</div>
+        </div>
+    </div>
+
+    <!-- Follow/Unfollow button -->
+    {% if user.is_authenticated and user != profile.user %}
+    <form method="POST" action="{% url 'project:toggle_follow' profile.pk %}" style="margin-top: 16px;">
+        {% csrf_token %}
+        {% if user.music_profile in profile.followers.all %}
+        <button type="submit"
+                style="padding: 8px 32px; background: transparent; border: 1px solid #888; color: #e0e0e0; border-radius: 20px; font-size: 14px; cursor: pointer;">
+            Following
+        </button>
+        {% else %}
+        <button type="submit"
+                style="padding: 8px 32px; background: #1db954; border: none; color: #000; border-radius: 20px; font-size: 14px; font-weight: 600; cursor: pointer;">
+            Follow
+        </button>
+        {% endif %}
+    </form>
+    {% endif %}
+
+    {% if user == profile.user %}
+    <p class="meta" style="margin-top: 12px;">This is your profile</p>
+    {% endif %}
+</div>
+
+<h2>Ratings</h2>
+{% for rating in profile.user.ratings.all %}
+<div class="card">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <img src="https://coverartarchive.org/release-group/{{ rating.song.album.musicbrainz_id }}/front-250"
+                 alt="{{ rating.song.album.title }}"
+                 onerror="this.style.display='none'"
+                 style="width: 40px; height: 40px; border-radius: 4px; object-fit: cover;">
+            <div>
+                <a href="{{ rating.song.get_absolute_url }}"><strong>{{ rating.song.title }}</strong></a>
+                <p class="meta">{{ rating.song.album.artist.name }} · {{ rating.song.album.title }}</p>
+            </div>
+        </div>
+        <span class="score">{{ rating.score }}</span>
+    </div>
+    {% if rating.review_text %}
+    <p style="margin-top: 8px;">{{ rating.review_text }}</p>
+    {% endif %}
+    <div style="display: flex; align-items: center; gap: 16px; margin-top: 8px;">
+        <span class="meta">{{ rating.get_like_count }} like{{ rating.get_like_count|pluralize }}</span>
+        <a href="{% url 'project:rating_detail' rating.pk %}" class="meta">{{ rating.comments.count }} comment{{ rating.comments.count|pluralize }}</a>
+        <span class="meta">{{ rating.created_at|timesince }} ago</span>
+    </div>
+</div>
+{% empty %}
+<p>No ratings yet.</p>
+{% endfor %}
+{% endblock %}

@@ -1,0 +1,67 @@
+<!-- File: search.html -->
+<!-- Author: Berk Komurcuoglu (berkkom@bu.edu), 4/28/2026 -->
+<!-- Description: Search page for finding artists via MusicBrainz API. -->
+
+{% extends 'project/base.html' %}
+
+{% block title %}Search - Music Rater{% endblock %}
+
+{% block content %}
+<h1>Discover Music</h1>
+
+<form method="GET" action="{% url 'project:search' %}" style="margin-bottom: 24px;">
+    <div style="display: flex; gap: 8px;">
+        <input type="text" name="q" value="{{ query }}" placeholder="Search for an artist..."
+               autofocus
+               style="flex: 1; padding: 12px 16px; background: #2a2a2a; border: 1px solid #3a3a3a; border-radius: 8px; color: #e0e0e0; font-size: 16px;">
+        <button type="submit"
+                style="padding: 12px 24px; background: #1db954; color: #000; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer;">
+            Search
+        </button>
+    </div>
+</form>
+
+{% if query %}
+{% for artist in artists %}
+<a href="{% url 'project:browse_artist' artist.id %}" style="text-decoration: none; color: inherit;">
+    <div class="card" style="display: flex; align-items: center; gap: 16px;">
+        <img class="artist-thumb"
+             data-artist="{{ artist.name }}"
+             src="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2250%22 height=%2250%22><rect fill=%22%232a2a2a%22 width=%2250%22 height=%2250%22 rx=%2225%22/><text x=%2225%22 y=%2232%22 fill=%22%23555%22 text-anchor=%22middle%22 font-size=%2220%22>♪</text></svg>"
+             style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover; flex-shrink: 0;">
+        <div style="flex: 1;">
+            <strong>{{ artist.name }}</strong>
+            <p class="meta">
+                {% if artist.type %}{{ artist.type }}{% endif %}
+                {% if artist.country %} · {{ artist.country }}{% endif %}
+                {% if artist.disambiguation %} · {{ artist.disambiguation }}{% endif %}
+            </p>
+        </div>
+        {% if artist.avg_rating %}
+        <div style="text-align: right; margin-right: 8px;">
+            <span class="score">{{ artist.avg_rating }}</span>
+            <p class="meta">{{ artist.rating_count }} review{{ artist.rating_count|pluralize }}</p>
+        </div>
+        {% endif %}
+        <span style="color: #555; font-size: 20px;">›</span>
+    </div>
+</a>
+{% empty %}
+<p>No artists found. Try a different search term.</p>
+{% endfor %}
+
+<script>
+document.querySelectorAll('.artist-thumb').forEach(img => {
+    const name = img.dataset.artist;
+    fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(name)}`)
+        .then(r => r.json())
+        .then(data => {
+            if (data.thumbnail && data.thumbnail.source) {
+                img.src = data.thumbnail.source;
+            }
+        })
+        .catch(() => {});
+});
+</script>
+{% endif %}
+{% endblock %}
