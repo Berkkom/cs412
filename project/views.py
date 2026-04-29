@@ -16,6 +16,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.db.models import Q
 from django.urls import reverse_lazy
 from .models import Artist, Album, Song, Profile, Rating, Comment
+from .forms import RegisterForm
 
 class ArtistListView(ListView):
     '''Display a searchable list of artists in the local database.'''
@@ -69,6 +70,13 @@ class ArtistDetailView(DetailView):
         context['ratings'] = artist_ratings
         context['avg_rating'] = round(stats['avg_rating'], 1) if stats['avg_rating'] else None
         context['total_ratings'] = stats['total_ratings']
+
+        # Get albums with rating stats
+        annotated_albums = Album.objects.filter(artist=artist).annotate(
+            album_avg=Avg('songs__ratings__score'),
+            album_count=Count('songs__ratings'),
+        ).order_by('release_date')
+        context['annotated_albums'] = annotated_albums
 
         # Aggregate ratings by country for the world map
         import json
@@ -206,17 +214,17 @@ class CustomLogoutView(LogoutView):
 class RegisterView(CreateView):
     '''Registration view that creates a new user and their profile.'''
     model = User
-    form_class = UserCreationForm
+    form_class = RegisterForm
     template_name = 'project/register.html'
     success_url = reverse_lazy('project:login')
 
     def form_valid(self, form):
-        '''After creating the user, create a Profile for them.'''
+        '''After creating the user, create a Profile with display name and country.'''
         response = super().form_valid(form)
-        # Create a profile for the new user
         Profile.objects.create(
             user=self.object,
-            display_name=self.object.username,
+            display_name=form.cleaned_data.get('display_name', self.object.username),
+            country=form.cleaned_data.get('country', ''),
         )
         return response
 

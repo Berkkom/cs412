@@ -60,22 +60,17 @@
 <!-- World Ratings Map -->
 {% if ratings %}
 <h2 style="margin-top: 32px;">Ratings Around the World</h2>
-<div id="world-map" style="height: 400px; border-radius: 8px; margin-bottom: 32px; background: #1a1a1a;"></div>
+<div id="world-map" style="border-radius: 8px; margin-bottom: 32px; background: #1a1a1a; overflow: hidden;"></div>
+<div id="map-tooltip" style="position: fixed; background: #222; color: #e0e0e0; padding: 8px 12px; border-radius: 6px; font-size: 13px; pointer-events: none; display: none; z-index: 1000; border: 1px solid #444;"></div>
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
-<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/topojson/3.0.2/topojson.min.js"></script>
 <script>
 (function() {
     const countryRatings = {{ country_data_json|safe }};
-
-    // Build a lookup by country name
     const ratingsByCountry = {};
-    countryRatings.forEach(r => {
-        ratingsByCountry[r.country] = r;
-    });
+    countryRatings.forEach(r => { ratingsByCountry[r.country] = r; });
 
-    // Country ID to name mapping (ISO 3166-1 numeric to name)
     const countryNames = {
         "840": "United States", "826": "United Kingdom", "792": "Turkey",
         "250": "France", "276": "Germany", "380": "Italy", "724": "Spain",
@@ -96,61 +91,73 @@
         "586": "Pakistan", "050": "Bangladesh", "144": "Sri Lanka",
     };
 
-    const map = L.map('world-map', { scrollWheelZoom: false }).setView([20, 0], 2);
-
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-        attribution: '&copy; OpenStreetMap &copy; CARTO',
-        maxZoom: 18,
-    }).addTo(map);
-
     function getColor(avg) {
-        // Darker green = higher rating
-        if (avg >= 9.5) return '#004d1a';
-        if (avg >= 9.0) return '#006622';
-        if (avg >= 8.5) return '#00802b';
-        if (avg >= 8.0) return '#009933';
-        if (avg >= 7.0) return '#1db954';
-        if (avg >= 6.0) return '#4cdf7c';
-        if (avg >= 5.0) return '#8cf0aa';
-        return '#c6f7d5';
+        if (avg >= 9.5) return '#006400';
+        if (avg >= 9.0) return '#228B22';
+        if (avg >= 8.0) return '#66BB6A';
+        if (avg >= 7.5) return '#B8860B';
+        if (avg >= 7.0) return '#DAA520';
+        if (avg >= 6.0) return '#FFD54F';
+        if (avg >= 5.0) return '#E57373';
+        if (avg >= 4.0) return '#D32F2F';
+        return '#8B0000';
     }
+
+    const container = document.getElementById('world-map');
+    const width = container.offsetWidth;
+    const height = 480;
+
+    const svg = d3.select('#world-map')
+        .append('svg')
+        .attr('width', width)
+        .attr('height', height)
+        .style('background', '#1a1a1a');
+
+    const projection = d3.geoNaturalEarth1()
+        .scale(width / 6.2)
+        .translate([width / 2, height / 2]);
+
+    const path = d3.geoPath().projection(projection);
+    const tooltip = document.getElementById('map-tooltip');
 
     fetch('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json')
         .then(r => r.json())
         .then(topoData => {
-            const geojson = topojson.feature(topoData, topoData.objects.countries);
+            const countries = topojson.feature(topoData, topoData.objects.countries);
 
-            L.geoJSON(geojson, {
-                style: function(feature) {
-                    const id = feature.id;
-                    const name = countryNames[id] || '';
+            svg.selectAll('path')
+                .data(countries.features)
+                .enter()
+                .append('path')
+                .attr('d', path)
+                .attr('fill', d => {
+                    const name = countryNames[d.id] || '';
+                    const rating = ratingsByCountry[name];
+                    return rating ? getColor(rating.avg) : '#2a2a2a';
+                })
+                .attr('stroke', '#444')
+                .attr('stroke-width', 0.5)
+                .style('cursor', d => {
+                    const name = countryNames[d.id] || '';
+                    return ratingsByCountry[name] ? 'pointer' : 'default';
+                })
+                .on('mouseover', function(event, d) {
+                    const name = countryNames[d.id] || '';
                     const rating = ratingsByCountry[name];
                     if (rating) {
-                        return {
-                            fillColor: getColor(rating.avg),
-                            weight: 1, opacity: 0.7,
-                            color: '#444', fillOpacity: 0.75,
-                        };
+                        d3.select(this).attr('stroke-width', 2).attr('stroke', '#fff');
+                        tooltip.innerHTML = '<strong>' + name + '</strong><br>Avg: <span style="color:' + getColor(rating.avg) + ';font-weight:700">' + rating.avg + '</span><br>' + rating.count + ' review' + (rating.count !== 1 ? 's' : '');
+                        tooltip.style.display = 'block';
                     }
-                    return {
-                        fillColor: '#2a2a2a',
-                        weight: 0.5, opacity: 0.3,
-                        color: '#333', fillOpacity: 0.3,
-                    };
-                },
-                onEachFeature: function(feature, layer) {
-                    const id = feature.id;
-                    const name = countryNames[id] || '';
-                    const rating = ratingsByCountry[name];
-                    if (rating) {
-                        layer.bindPopup(
-                            '<strong>' + name + '</strong><br>' +
-                            'Avg: <span style="color:' + getColor(rating.avg) + ';font-weight:700">' + rating.avg + '</span><br>' +
-                            rating.count + ' review' + (rating.count !== 1 ? 's' : '')
-                        );
-                    }
-                }
-            }).addTo(map);
+                })
+                .on('mousemove', function(event) {
+                    tooltip.style.left = (event.clientX + 12) + 'px';
+                    tooltip.style.top = (event.clientY - 10) + 'px';
+                })
+                .on('mouseout', function() {
+                    d3.select(this).attr('stroke-width', 0.5).attr('stroke', '#444');
+                    tooltip.style.display = 'none';
+                });
         });
 })();
 </script>

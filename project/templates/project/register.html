@@ -1,6 +1,6 @@
 <!-- File: register.html -->
-<!-- Author: Berk Komurcuoglu (berkkom@bu.edu), 4/19/2026 -->
-<!-- Description: Registration page for the music rating application. -->
+<!-- Author: Berk Komurcuoglu (berkkom@bu.edu), 4/29/2026 -->
+<!-- Description: Registration page with display name and country fields. -->
 
 {% extends 'project/base.html' %}
 
@@ -29,6 +29,18 @@
         <div style="margin-bottom: 16px;">
             <label style="display: block; font-size: 14px; color: #aaa; margin-bottom: 6px;">Username</label>
             <input type="text" name="username" value="{{ form.username.value|default:'' }}" required autofocus
+                   style="width: 100%; padding: 10px 14px; background: #2a2a2a; border: 1px solid #3a3a3a; border-radius: 6px; color: #e0e0e0; font-size: 16px;">
+        </div>
+        <div style="margin-bottom: 16px;">
+            <label style="display: block; font-size: 14px; color: #aaa; margin-bottom: 6px;">Display Name</label>
+            <input type="text" name="display_name" value="{{ form.display_name.value|default:'' }}" required
+                   placeholder="How your name appears on your profile"
+                   style="width: 100%; padding: 10px 14px; background: #2a2a2a; border: 1px solid #3a3a3a; border-radius: 6px; color: #e0e0e0; font-size: 16px;">
+        </div>
+        <div style="margin-bottom: 16px;">
+            <label style="display: block; font-size: 14px; color: #aaa; margin-bottom: 6px;">Country</label>
+            <input type="text" name="country" value="{{ form.country.value|default:'' }}"
+                   placeholder="e.g. United States, Turkey, France"
                    style="width: 100%; padding: 10px 14px; background: #2a2a2a; border: 1px solid #3a3a3a; border-radius: 6px; color: #e0e0e0; font-size: 16px;">
         </div>
         <div style="margin-bottom: 16px;">

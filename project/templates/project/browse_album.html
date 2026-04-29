@@ -3,6 +3,7 @@
 <!-- Description: Step 3 - Browse tracks for a specific album from MusicBrainz. -->
 
 {% extends 'project/base.html' %}
+{% load music_filters %}
 
 {% block title %}{{ album_title }} - Music Rater{% endblock %}
 
@@ -41,7 +42,7 @@
         <strong>{{ track.title }}</strong>
         {% if track.duration %}
         <span class="meta" style="margin-left: 8px;">
-            {{ track.duration|floatformat:0 }}ms
+            {{ track.duration|ms_to_duration }}
         </span>
         {% endif %}
     </div>
