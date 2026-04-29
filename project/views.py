@@ -216,17 +216,19 @@ class RegisterView(CreateView):
     model = User
     form_class = RegisterForm
     template_name = 'project/register.html'
-    success_url = reverse_lazy('project:login')
+    success_url = reverse_lazy('project:search')
 
     def form_valid(self, form):
-        '''After creating the user, create a Profile with display name and country.'''
+        '''After creating the user, create a Profile and log them in.'''
+        from django.contrib.auth import login
         response = super().form_valid(form)
         Profile.objects.create(
             user=self.object,
             display_name=form.cleaned_data.get('display_name', self.object.username),
             country=form.cleaned_data.get('country', ''),
         )
-        return response
+        login(self.request, self.object)
+        return redirect('project:search')
 
 # ─── MusicBrainz Search Views ──────────────────────────────────────
 
