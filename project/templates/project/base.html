@@ -84,11 +84,15 @@
     <nav>
         <a href="{% url 'project:search' %}" class="logo">Music Rater</a>
         <a href="{% url 'project:feed' %}">Feed</a>
-        <a href="{% url 'project:search' %}">Discover Music</a>
-        <a href="{% url 'project:profile_list' %}">Search Profiles</a>
+        <a href="{% url 'project:search' %}">Search</a>
+        <a href="{% url 'project:profile_list' %}">Profiles</a>
         <div style="margin-left: auto; display: flex; align-items: center; gap: 16px;">
             {% if user.is_authenticated %}
+            {% if user.music_profile %}
             <a href="{% url 'project:profile_detail' user.music_profile.pk %}">@{{ user.username }}</a>
+            {% else %}
+            <span style="color: #e0e0e0;">@{{ user.username }}</span>
+            {% endif %}
             <form method="POST" action="{% url 'project:logout' %}" style="display: inline;">
                 {% csrf_token %}
                 <button type="submit" style="background: none; border: none; color: #e0e0e0; font-size: 14px; font-weight: 500; cursor: pointer; font-family: inherit;">Logout</button>
