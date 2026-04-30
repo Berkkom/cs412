@@ -243,6 +243,9 @@ def search(request):
     '''
     Search for artists using the MusicBrainz API.
     Users click an artist to browse their albums, then tracks, then rate.
+
+    Parameters:
+    - request: the HTTP request object; GET parameter 'q' contains the search query.
     '''
     query = request.GET.get('q', '').strip()
     artists = []
@@ -292,9 +295,13 @@ def search(request):
 
 def browse_artist(request, artist_mbid):
     '''
-    Step 2: Browse albums for a given artist using the MusicBrainz API.
+    Browse albums for a given artist using the MusicBrainz API.
     Fetches official studio albums (release-groups) and displays them
     for the user to click and browse tracks.
+
+    Parameters:
+    - request: the HTTP request object.
+    - artist_mbid: the MusicBrainz ID of the artist to browse.
     '''
     albums = []
     artist_name = ''
@@ -374,9 +381,14 @@ def browse_artist(request, artist_mbid):
 
 def browse_album(request, artist_mbid, release_group_mbid):
     '''
-    Step 3: Browse tracks for a given album using the MusicBrainz API.
+    Browse tracks for a given album using the MusicBrainz API.
     Fetches the tracklist from a specific release and displays songs
     for the user to import and rate.
+
+    Parameters:
+    - request: the HTTP request object.
+    - artist_mbid: the MusicBrainz ID of the artist.
+    - release_group_mbid: the MusicBrainz release-group ID of the album.
     '''
     tracks = []
     album_title = ''
@@ -499,6 +511,10 @@ def import_song(request):
     Import a song from MusicBrainz into the local database.
     Creates Artist, Album, and Song records if they don't already exist.
     Redirects to the song detail page after import.
+
+    Parameters:
+    - request: the HTTP request object; POST data contains song, artist,
+      and album details from MusicBrainz.
     '''
     if request.method == 'POST':
         # Get data from the form
@@ -551,6 +567,10 @@ def rate_song(request, pk):
     Create or update a rating for a song.
     If the user has already rated this song, updates the existing rating.
     Otherwise, creates a new rating.
+
+    Parameters:
+    - request: the HTTP request object; POST data contains 'score' and 'review_text'.
+    - pk: the primary key of the Song to rate.
     '''
     song = get_object_or_404(Song, pk=pk)
 
@@ -582,7 +602,13 @@ def rate_song(request, pk):
 
 @login_required
 def delete_rating(request, pk):
-    '''Delete a user's rating for a song.'''
+    '''
+    Delete a user's rating for a song.
+
+    Parameters:
+    - request: the HTTP request object.
+    - pk: the primary key of the Rating to delete.
+    '''
     rating = get_object_or_404(Rating, pk=pk, user=request.user)
     song_pk = rating.song.pk
     if request.method == 'POST':
@@ -596,6 +622,9 @@ def feed(request):
     '''
     Display an activity feed of recent ratings from users
     the logged-in user follows.
+
+    Parameters:
+    - request: the HTTP request object; GET parameter 'page' for pagination.
     '''
     profile = request.user.music_profile
     following_users = profile.following.values_list('user', flat=True)
@@ -620,7 +649,14 @@ def feed(request):
 
 @login_required
 def toggle_like(request, pk):
-    '''Toggle a like on a rating.'''
+    '''
+    Toggle a like on a rating. If the user has already liked it,
+    removes the like. Otherwise, adds a like.
+
+    Parameters:
+    - request: the HTTP request object; POST data may contain 'next' URL for redirect.
+    - pk: the primary key of the Rating to like/unlike.
+    '''
     rating = get_object_or_404(Rating, pk=pk)
     if request.method == 'POST':
         if rating.likes.filter(id=request.user.id).exists():
@@ -637,7 +673,13 @@ def toggle_like(request, pk):
 
 @login_required
 def add_comment(request, pk):
-    '''Add a comment to a rating.'''
+    '''
+    Add a comment to a rating.
+
+    Parameters:
+    - request: the HTTP request object; POST data contains 'text' for the comment.
+    - pk: the primary key of the Rating to comment on.
+    '''
     rating = get_object_or_404(Rating, pk=pk)
     if request.method == 'POST':
         text = request.POST.get('text', '').strip()
@@ -651,7 +693,13 @@ def add_comment(request, pk):
 
 @login_required
 def delete_comment(request, pk):
-    '''Delete a comment (only by the comment author).'''
+    '''
+    Delete a comment. Only the comment author can delete their own comment.
+
+    Parameters:
+    - request: the HTTP request object.
+    - pk: the primary key of the Comment to delete.
+    '''
     comment = get_object_or_404(Comment, pk=pk, user=request.user)
     rating_pk = comment.rating.pk
     if request.method == 'POST':
@@ -662,7 +710,13 @@ def delete_comment(request, pk):
 
 @login_required
 def toggle_follow(request, pk):
-    '''Follow or unfollow a user profile.'''
+    '''
+    Follow or unfollow a user profile. A user cannot follow themselves.
+
+    Parameters:
+    - request: the HTTP request object.
+    - pk: the primary key of the Profile to follow/unfollow.
+    '''
     target_profile = get_object_or_404(Profile, pk=pk)
     user_profile = request.user.music_profile
 
